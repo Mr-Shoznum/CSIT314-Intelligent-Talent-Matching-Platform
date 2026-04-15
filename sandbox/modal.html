@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Modal Popup Demo</title>
+    <link rel="stylesheet" href="../front-end/assests/styling/modal-style.css">
+</head>
+<body>
+    <div class="page-content">
+        <h1>Modal Popup Example</h1>
+        <p>Click the buttons below to trigger the authentication modal popup:</p>
+        
+        <div class="button-group">
+            <button class="trigger-btn" onclick="openModal('job')">View Job Position</button>
+            <button class="trigger-btn" onclick="openModal('candidate')">View Candidate Profile</button>
+        </div>
+    </div>
+
+    <!-- Modal Overlay -->
+    <div id="modal-overlay" class="modal-overlay hidden">
+        <div class="modal-container">
+            <div class="modal-content">
+                <h2 class="modal-title">Sign up or log in</h2>
+                <p id="modal-message" class="modal-message">
+                    Please sign up or log in to view the job position
+                </p>
+                
+                <div class="modal-buttons">
+                    <button class="modal-btn signup-btn" onclick="handleAction('signup')">Sign Up</button>
+                    <button class="modal-btn login-btn" onclick="handleAction('login')">Log In</button>
+                </div>
+                
+                <button class="modal-close" onclick="closeModal()">Not now</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="../back-end/scripting/js-scripts/modal-script.js"></script>
+</body>
+</html>
