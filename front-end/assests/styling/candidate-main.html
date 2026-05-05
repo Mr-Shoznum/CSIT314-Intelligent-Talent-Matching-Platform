@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <script src="../../../back-end/scripting/js-scripts/jobs.js"></script>
+        <link rel="stylesheet" href="../../assests/styling/style.css">
+    </head>
+    <body>
+        <header>
+            <img src="../../assests/images/ITMP-clear-header-logo.png"></img>
+            <nav>
+                <a>Sign out</a>
+                <a>Profile</a>
+            </nav>
+        </header>
+
+        <div class="container">
+            <b style="font-size: large;">Filters:</b><br><br>
+            
+            Location:<br>
+            <select id="locationSelect">
+                <option>Wollongong</option>
+                <option>Sydney</option>
+                <option>Canberra</option>
+                <option>Melbourne</option>
+                <option>Brisbane</option>
+                <option>Perth</option>
+            </select><br><br>
+            
+            Type:<br>
+            <select id="typeSelect">
+                <option>Full-time</option>
+                <option>Part-time</option>
+            </select><br><br>
+            
+            Work from:<br>
+            <select id="workFromSelect">
+                <option>In-person</option>
+                <option>Remote</option>
+                <option>Hybrid</option>
+            </select><br><br>
+
+            <b style="font-size: large;">Search for a job title:</b><br>
+            <input>
+            <button>Search</button>
+
+            <div id="results" style="margin-top: 30px;"></div>
+        </div>
+    </body>
+</html>
