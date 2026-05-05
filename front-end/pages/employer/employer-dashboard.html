@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <!--No JS yet, but figured id make a file anyways and reference it-->
+        <script src="home.js"></script>
+        <link rel="stylesheet" href="../../assests/styling/employer-dashboard.css">
+        <link rel="stylesheet" href="../../assests/styling/footer.css">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+        <title>Intelligent Talent Matching Platform</title>
+        <link rel="icon" type="image/x-icon" href="../../assests/images/ITMP-icon-logo.ico">
+    </head>
+    <body>
+        <div class="page-content">
+            <!--Top navigation-->
+            <header>
+                <img src="../../assests/images/ITMP-clear-header-logo.png"></img>
+                <nav>
+                    Employer Dashboard
+                    <button>Logout</button>
+                </nav>
+            </header>
+
+
+            <div class="employee-dashboard-content">
+                <h1>Welcome back to ITMP "Company Name"</h1>
+                <button class="find-candidates-btn">Find Candidates</button>
+            </div>
+
+            <div class ="job-listing-staus">
+                <h2>List of current job listings</h2>
+            </div>
+
+            <!--job listings-->
+            <div class="job-listing">
+                <div class="job-listing-info">
+                    <h3>Front-End Developer</h3>
+                    <p>Current applicants: 5</p>
+                </div>
+                <button class="job-edit-btn">
+
+                    <!--pen icon to edit-->
+                    <i class="fas fa-pen"></i>
+                </button>
+            </div>
+
+            <div class="job-listing">
+                <div class="job-listing-info">
+                    <h3>Back-end Developer</h3>
+                    <p>Current applicants: 8</p>
+                </div>
+                <button class="job-edit-btn">
+                    <!--Pen icon-->
+                    <i class="fas fa-pen"></i>
+                </button>
+            </div>
+
+            <div class="create-job-listing-button">
+                <button class="create-job-listing-btn">Create another job listing</button>
+            </div>
+
+<!--footer stuff-->
+            <footer>
+                <div class="footer-container">
+                    
+                    <div class="footer-content">
+                        
+                        <!-- Left: Brand -->
+                        <div class="footer-brand">
+                            <div class="footer-logo"></div>
+                            <div>
+                                <h2>ITMP</h2>
+                                <p>Intelligent Talent Matching Platform</p>
+                            </div>
+                        </div>
+
+                        <!-- Center: Legal Links -->
+                        <div class="footer-links">
+                            <a href="#" class="footer-link">Terms of Service</a>
+                            <a href="#" class="footer-link">Privacy Policy</a>
+                            <a href="#" class="footer-link">Cookie Policy</a>
+                            <a href="#" class="footer-link">Candidate Terms</a>
+                            <a href="#" class="footer-link">Employer Terms</a>
+                            <a href="#" class="footer-link">Licenses</a>
+                        </div>
+
+                        <!-- Right: Social Icons -->
+                        <div class="footer-social">
+                            <a href="#" aria-label="YouTube">
+                                <i class="fa-brands fa-youtube"></i>
+                            </a>
+                            <a href="#" aria-label="Facebook">
+                                <i class="fa-brands fa-facebook"></i>
+                            </a>
+                            <a href="#" aria-label="Instagram">
+                                <i class="fa-brands fa-instagram"></i>
+                            </a>
+                            <a href="#" aria-label="LinkedIn">
+                                <i class="fa-brands fa-linkedin"></i>
+                            </a>
+                            <a href="#" aria-label="X (Twitter)">
+                                <i class="fa-brands fa-x-twitter"></i>
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- Bottom Bar -->
+                    <div class="footer-bottom">
+                        <div>
+                            © 2026 Intelligent Talent Matching Platform (ITMP). All rights reserved.
+                        </div>
+                        <div class="footer-bottom-right">
+                            <a href="#">Accessibility</a>
+                            <a href="#">Sitemap</a>
+                            <a href="#">Contact Support</a>
+                        </div>
+                    </div>
+
+                </div>
+            </footer>
+        </div>
+
+        <!-- Modal Overlay -->
+        <div id="modal-overlay" class="modal-overlay hidden">
+            <script src="../../../back-end/scripting/js-scripts/modal-script.js"></script>
+
+            <link rel="stylesheet" href="../../assests/styling/modal-style.css">
+
+            <div class="modal-container">
+                <div class="modal-content">
+                    <h2 class="modal-title">Sign up or log in</h2>
+                    <p id="modal-message" class="modal-message">
+                        Please sign up or log in to view the job position
+                    </p>
+                    
+                    <div class="modal-buttons">
+                        <button class="modal-btn signup-btn" onclick="handleAction('signup')">Sign Up</button>
+                        <button class="modal-btn login-btn" onclick="handleAction('login')">Log In</button>
+                    </div>
+                    
+                    <button class="modal-close" onclick="closeModal()">Not now</button>
+                </div>
+            </div>
+        </div>
+    
+        
+    </body>
+</html>
