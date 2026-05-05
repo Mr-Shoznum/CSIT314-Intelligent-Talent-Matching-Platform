@@ -1,0 +1,156 @@
+body {
+    margin: 0;
+}
+
+header {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px 20px 90px;
+    background-color: #034a96;
+    color: white;
+    position: relative;
+}
+
+header img {
+    width: 200px;
+    height: auto;
+    margin-right: auto;
+}
+
+nav {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    display: flex;
+    gap: 10px;
+}
+
+nav button {
+    padding: 8px 16px;
+    background-color: rgba(255, 255, 255, 0.2);
+    color: white;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: background-color 0.3s ease;
+}
+
+nav button:hover {
+    background-color: rgba(255, 255, 255, 0.3); 
+}
+
+
+.website-name {
+    margin-top: 20px;
+    text-align: center;
+}
+
+.employee-dashboard-content {
+    margin-top: 200px;
+    text-align: center;
+}
+
+.job-listing-staus {
+    margin-top: 40px;
+    text-align: center;
+}
+
+.job-listing {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #ffffff;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    padding: 24px 28px;
+    margin: 16px auto;
+    max-width: 600px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
+}
+
+.job-listing-info {
+    flex: 1;
+}
+
+.job-listing-info h3 {
+    margin: 0 0 8px 0;
+    color: #034a96;
+    font-size: 18px;
+    font-weight: 700;
+}
+
+.job-listing-info p {
+    margin: 0;
+    color: #555;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.job-edit-btn {
+    background-color: transparent;
+    border: none;
+    color: #034a96;
+    font-size: 18px;
+    cursor: pointer;
+    padding: 8px 12px;
+    transition: transform 0.2s ease, color 0.2s ease;
+}
+
+.job-edit-btn:hover {
+    transform: scale(1.1);
+    color: #0A57A9;
+}
+
+.find-candidates-btn {
+    margin-top: 24px;
+    background-color: #034a96;
+    color: #ffffff;
+    border: 2px solid #034a96;
+    border-radius: 999px;
+    padding: 14px 32px;
+    font-size: 18px;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+    box-shadow: 0 12px 30px rgba(3, 74, 150, 0.12);
+}
+
+.find-candidates-btn:hover {
+    background-color: #f4f7ff;
+    transform: translateY(-1px);
+    box-shadow: 0 16px 34px rgba(3, 74, 150, 0.16);
+}
+
+
+.create-job-listing-button {
+    display: flex;
+    justify-content: center;
+    margin-top: 32px;
+    margin-bottom: 60px;
+}       
+
+.create-job-listing-btn {
+    background-color: #0A57A9;
+    color: #ffffff;
+    border: 2px solid #0A57A9;
+    border-radius: 999px;
+    padding: 14px 32px;
+    font-size: 16px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+    box-shadow: 0 10px 22px rgba(10, 87, 169, 0.18);
+}
+
+.create-job-listing-btn:hover {
+    background-color: #f4f7ff;
+    transform: translateY(-1px);
+    box-shadow: 0 16px 34px rgba(3, 74, 150, 0.16);
+}
+
+.view-more-candidates button:hover {
+    opacity: 0.9;
+}
