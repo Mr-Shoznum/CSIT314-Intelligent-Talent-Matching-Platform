@@ -1,0 +1,13 @@
+{
+  id: 3434232,
+  password: '',
+  full_name: '',
+  dob: '',
+  contact: {
+    phone: '', 
+    email: '',
+  },
+  education: '',
+  major: '',
+  yoe:   
+}
