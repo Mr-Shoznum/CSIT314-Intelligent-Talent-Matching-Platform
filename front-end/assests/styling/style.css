@@ -1,0 +1,48 @@
+body { 
+    margin: 0; 
+    font-family: Arial, sans-serif; 
+}
+
+header {
+    background-color: #034a96;
+    color: white;
+    display: flex;
+    align-items: center;
+    padding: 10px 20px;
+}
+
+header h1 { 
+    font-size: 20px; margin: 0; 
+}
+
+nav { 
+    margin-left: auto; 
+}
+
+nav a {
+    color: white;
+    text-decoration: none;
+    margin-left: 15px;
+    font-weight: bold;
+}
+.container { 
+    padding: 20px; 
+}
+
+input, select {
+    width: 300px;
+    padding: 8px;
+    margin-top: 5px;
+}
+
+button {
+    background-color: #0A57A9;
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    cursor: pointer;
+}
+
+button:hover { 
+    opacity: 0.9; 
+}

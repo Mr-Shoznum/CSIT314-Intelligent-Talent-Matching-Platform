@@ -1,0 +1,289 @@
+{
+  "jobs": [
+    {
+      "id": "job_001",
+      "title": "Senior Frontend Developer",
+      "company": "TechSolutions Inc.",
+      "company_initials": "TS",
+      "company_about": "TechSolutions Inc. is a leading software company specialising in enterprise-grade web platforms. With over 200 engineers across 5 countries, we build tools that power businesses at scale.",
+      "company_size": "200–500 employees",
+      "industry": "Software / SaaS",
+      "match_score": 92,
+      "location": "Sydney, NSW",
+      "work_mode": "Hybrid",
+      "salary_min": 120000,
+      "salary_max": 140000,
+      "salary_display": "$120k – $140k",
+      "job_type": "Full-time",
+      "posted_date": "2026-05-08",
+      "expires_date": "2026-06-08",
+      "applications_count": 45,
+      "description": "Looking for an experienced React developer to lead our user interface team and build scalable platforms.",
+      "full_description": "We are seeking a talented and experienced Senior Frontend Developer to join our growing engineering team. In this role, you will architect and implement complex user interfaces, collaborate closely with product designers, and mentor junior developers. You will play a key role in establishing frontend best practices and driving our platform's visual evolution.",
+      "responsibilities": [
+        "Lead the design and implementation of reusable React component libraries",
+        "Collaborate with UX/UI designers to translate wireframes into pixel-perfect interfaces",
+        "Conduct code reviews and mentor junior frontend engineers",
+        "Drive performance optimisation initiatives across the web platform",
+        "Partner with backend engineers to define and integrate REST/GraphQL APIs",
+        "Write unit and integration tests using Jest and React Testing Library"
+      ],
+      "requirements": [
+        "5+ years of professional frontend development experience",
+        "Deep expertise in React and the modern JavaScript ecosystem",
+        "Strong proficiency in TypeScript",
+        "Experience with state management (Redux, Zustand, or similar)",
+        "Solid understanding of web performance and accessibility (WCAG 2.1)",
+        "Experience with CI/CD pipelines (GitHub Actions, CircleCI)"
+      ],
+      "nice_to_have": [
+        "Experience with micro-frontend architecture",
+        "Familiarity with design systems (Storybook)",
+        "GraphQL client experience (Apollo or urql)"
+      ],
+      "benefits": [
+        "Flexible hybrid work – 2 days in our Sydney CBD office",
+        "Annual learning & development budget of $3,000",
+        "Equity options after 12-month cliff",
+        "Comprehensive private health insurance",
+        "Monthly wellness stipend ($150/month)",
+        "15 days additional leave on top of statutory entitlements"
+      ],
+      "skills": [
+        { "name": "JavaScript", "required": true },
+        { "name": "React", "required": true },
+        { "name": "TypeScript", "required": true },
+        { "name": "CSS / Sass", "required": false },
+        { "name": "REST APIs", "required": false },
+        { "name": "Jest", "required": false }
+      ]
+    },
+    {
+      "id": "job_002",
+      "title": "Full Stack Engineer",
+      "company": "Innovate Data",
+      "company_initials": "ID",
+      "company_about": "Innovate Data is a fast-growing data intelligence company helping enterprises unlock insights from their data pipelines. We are Series B funded with 80 engineers globally.",
+      "company_size": "80–200 employees",
+      "industry": "Data & Analytics",
+      "match_score": 85,
+      "location": "Remote",
+      "work_mode": "Remote",
+      "salary_min": 110000,
+      "salary_max": 130000,
+      "salary_display": "$110k – $130k",
+      "job_type": "Full-time",
+      "posted_date": "2026-05-10",
+      "expires_date": "2026-06-10",
+      "applications_count": 72,
+      "description": "Join our agile team to build scalable full-stack applications using Python and Node.js for global clients.",
+      "full_description": "As a Full Stack Engineer at Innovate Data, you will own features end-to-end — from database schema design to polished frontend components. You'll work directly with product managers and data scientists to ship features that process millions of data points daily.",
+      "responsibilities": [
+        "Build and maintain scalable backend services in Python (FastAPI / Django)",
+        "Develop responsive frontend features using React and TypeScript",
+        "Design and optimise PostgreSQL and Redshift data models",
+        "Participate in on-call rotations and incident response",
+        "Contribute to internal tooling and developer experience improvements",
+        "Write technical documentation and RFC proposals for major changes"
+      ],
+      "requirements": [
+        "3+ years of full-stack engineering experience",
+        "Proficiency in Python and at least one JavaScript framework",
+        "Strong SQL skills and experience with relational databases",
+        "Experience deploying applications on AWS (EC2, RDS, Lambda)",
+        "Familiarity with agile/scrum development methodologies"
+      ],
+      "nice_to_have": [
+        "Experience with data pipeline tools (dbt, Airflow)",
+        "Knowledge of containerisation (Docker, Kubernetes)",
+        "Open source contributions"
+      ],
+      "benefits": [
+        "Fully remote — work from anywhere in Australia",
+        "Competitive equity package",
+        "Home office setup allowance ($2,000 one-time)",
+        "$2,500 annual learning budget",
+        "Paid parental leave (16 weeks primary, 8 weeks secondary)",
+        "Quarterly team offsites in rotating Australian cities"
+      ],
+      "skills": [
+        { "name": "Python", "required": true },
+        { "name": "SQL", "required": true },
+        { "name": "React", "required": false },
+        { "name": "AWS", "required": true },
+        { "name": "Docker", "required": false },
+        { "name": "PostgreSQL", "required": false }
+      ]
+    },
+    {
+      "id": "job_003",
+      "title": "Backend Engineer – Platform",
+      "company": "CloudBase Systems",
+      "company_initials": "CB",
+      "company_about": "CloudBase Systems builds developer infrastructure for cloud-native applications. Our platform powers over 10,000 startups and enterprises, processing 50 billion API calls per month.",
+      "company_size": "500–1000 employees",
+      "industry": "Cloud Infrastructure",
+      "match_score": 78,
+      "location": "Melbourne, VIC",
+      "work_mode": "On-site",
+      "salary_min": 130000,
+      "salary_max": 160000,
+      "salary_display": "$130k – $160k",
+      "job_type": "Full-time",
+      "posted_date": "2026-05-05",
+      "expires_date": "2026-06-05",
+      "applications_count": 29,
+      "description": "Work on high-scale distributed systems that serve millions of developers worldwide.",
+      "full_description": "CloudBase Systems is looking for a Backend Engineer to join our Platform team in Melbourne. You will design, build, and scale the core infrastructure services that underpin our entire product — working with Golang and distributed systems at a scale that few engineers ever experience.",
+      "responsibilities": [
+        "Design and implement high-throughput microservices in Golang",
+        "Build and maintain distributed caching and messaging layers (Redis, Kafka)",
+        "Improve system observability with structured logging, tracing, and alerting",
+        "Work on capacity planning and cost optimisation for our cloud infrastructure",
+        "Collaborate with security teams to harden services against vulnerabilities",
+        "Mentor mid-level engineers and review technical designs"
+      ],
+      "requirements": [
+        "4+ years of backend engineering experience",
+        "Strong Golang or Java/Kotlin skills",
+        "Deep understanding of distributed systems concepts",
+        "Experience with Kubernetes and container orchestration",
+        "Solid grasp of networking fundamentals (TCP/IP, HTTP/2, gRPC)"
+      ],
+      "nice_to_have": [
+        "Experience contributing to open source infrastructure projects",
+        "Knowledge of eBPF or low-level Linux systems",
+        "Prior experience at a high-growth SaaS company"
+      ],
+      "benefits": [
+        "Generous base salary plus bi-annual bonus",
+        "Fully stocked kitchen and catered lunches in Melbourne office",
+        "$5,000 annual conference and training budget",
+        "Private health and dental for you and your family",
+        "20 days additional leave",
+        "Relocation assistance available"
+      ],
+      "skills": [
+        { "name": "Golang", "required": true },
+        { "name": "Kubernetes", "required": true },
+        { "name": "Distributed Systems", "required": true },
+        { "name": "Redis", "required": false },
+        { "name": "Kafka", "required": false },
+        { "name": "gRPC", "required": false }
+      ]
+    },
+    {
+      "id": "job_004",
+      "title": "Data Engineer",
+      "company": "FinStream Analytics",
+      "company_initials": "FA",
+      "company_about": "FinStream Analytics is a fintech data company providing real-time market intelligence to hedge funds, banks, and retail investors across the Asia-Pacific region.",
+      "company_size": "50–80 employees",
+      "industry": "Fintech / Data",
+      "match_score": 70,
+      "location": "Sydney, NSW",
+      "work_mode": "Hybrid",
+      "salary_min": 115000,
+      "salary_max": 135000,
+      "salary_display": "$115k – $135k",
+      "job_type": "Full-time",
+      "posted_date": "2026-05-12",
+      "expires_date": "2026-06-12",
+      "applications_count": 18,
+      "description": "Build robust data pipelines and warehousing solutions that power financial analytics at scale.",
+      "full_description": "FinStream Analytics is hiring a Data Engineer to help us scale our real-time data infrastructure. You will design and maintain ETL pipelines, work closely with quants and analysts, and ensure data quality across our entire platform.",
+      "responsibilities": [
+        "Design, build, and maintain scalable ETL/ELT data pipelines",
+        "Manage and optimise our data warehouse (Snowflake / BigQuery)",
+        "Collaborate with data scientists to productionise ML models",
+        "Implement data quality monitoring and alerting frameworks",
+        "Document data lineage and maintain a centralised data catalogue",
+        "Support analysts with ad-hoc data requests and dashboard tooling"
+      ],
+      "requirements": [
+        "3+ years of data engineering experience",
+        "Strong SQL and Python skills",
+        "Experience with dbt and a modern data stack",
+        "Hands-on experience with Airflow or Prefect for orchestration",
+        "Familiarity with cloud data warehouses (Snowflake, BigQuery, or Redshift)"
+      ],
+      "nice_to_have": [
+        "Experience in a financial services context",
+        "Knowledge of streaming technologies (Kafka, Flink)",
+        "Familiarity with Spark for large-scale batch processing"
+      ],
+      "benefits": [
+        "Hybrid work from our Sydney CBD office",
+        "Annual performance bonus",
+        "Learning budget ($2,000/year)",
+        "Superannuation above statutory rate (12.5%)",
+        "Flexible start times",
+        "EAP and mental health support"
+      ],
+      "skills": [
+        { "name": "Python", "required": true },
+        { "name": "SQL", "required": true },
+        { "name": "dbt", "required": true },
+        { "name": "Airflow", "required": false },
+        { "name": "Snowflake", "required": false },
+        { "name": "Kafka", "required": false }
+      ]
+    },
+    {
+      "id": "job_005",
+      "title": "DevOps / Platform Engineer",
+      "company": "Nexus Digital",
+      "company_initials": "ND",
+      "company_about": "Nexus Digital is a full-service digital agency delivering web applications and mobile products for Australia's top retail and media brands.",
+      "company_size": "100–200 employees",
+      "industry": "Digital Agency",
+      "match_score": 65,
+      "location": "Brisbane, QLD",
+      "work_mode": "Hybrid",
+      "salary_min": 105000,
+      "salary_max": 125000,
+      "salary_display": "$105k – $125k",
+      "job_type": "Full-time",
+      "posted_date": "2026-05-01",
+      "expires_date": "2026-06-01",
+      "applications_count": 34,
+      "description": "Own and evolve our CI/CD infrastructure and cloud environments across a diverse portfolio of client projects.",
+      "full_description": "Nexus Digital is seeking a DevOps / Platform Engineer to join our infrastructure team. You'll be responsible for building and maintaining CI/CD pipelines, managing multi-cloud environments, and uplifting deployment practices across the agency's client delivery teams.",
+      "responsibilities": [
+        "Maintain and improve CI/CD pipelines across GitHub Actions and GitLab CI",
+        "Manage AWS and GCP environments using Terraform",
+        "Implement and own container orchestration using Kubernetes (EKS/GKE)",
+        "Respond to and resolve infrastructure incidents",
+        "Uplift deployment practices and coach development teams",
+        "Drive IaC adoption and infrastructure-as-code standards"
+      ],
+      "requirements": [
+        "3+ years of DevOps or Site Reliability Engineering experience",
+        "Strong knowledge of AWS or GCP",
+        "Hands-on Terraform and Infrastructure-as-Code experience",
+        "Experience with Kubernetes in production environments",
+        "Scripting skills in Bash and Python"
+      ],
+      "nice_to_have": [
+        "AWS Certified DevOps Engineer or equivalent certification",
+        "Experience with observability stacks (Datadog, Grafana, Prometheus)",
+        "Knowledge of GitOps workflows (ArgoCD, Flux)"
+      ],
+      "benefits": [
+        "Flexible hybrid arrangement",
+        "Certification reimbursement (unlimited)",
+        "Generous leave package (25 days)",
+        "Regular team events and socials",
+        "Career progression pathways into leadership"
+      ],
+      "skills": [
+        { "name": "AWS", "required": true },
+        { "name": "Terraform", "required": true },
+        { "name": "Kubernetes", "required": true },
+        { "name": "Docker", "required": false },
+        { "name": "Python", "required": false },
+        { "name": "CI/CD", "required": false }
+      ]
+    }
+  ]
+}

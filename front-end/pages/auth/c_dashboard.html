@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Candidate Dashboard - ITMP</title>
+    <link rel="stylesheet" href="../../assests/styling/global.css">
+    <link rel="stylesheet" href="../../assests/styling/dashboard.css">
+    <style>
+        /* Profile card clickable */
+        .profile-header-link {
+            display: block;
+            text-decoration: none;
+            color: inherit;
+            cursor: pointer;
+            border-radius: var(--radius-card);
+            transition: background 0.2s;
+            padding: 0.5rem;
+            margin: -0.5rem -0.5rem 0;
+        }
+        .profile-header-link:hover .profile-avatar {
+            background-color: var(--primary-hover);
+        }
+        .profile-header-link:hover h2 {
+            color: var(--primary);
+        }
+
+        /* Job card title clickable */
+        .job-card-title-link {
+            text-decoration: none;
+            color: var(--primary);
+            cursor: pointer;
+        }
+        .job-card-title-link:hover {
+            text-decoration: underline;
+        }
+
+        /* Saved jobs section */
+        .section-tabs {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+        .tab-btn {
+            background: none;
+            border: 2px solid var(--border-color);
+            color: var(--text-muted);
+            padding: 0.35rem 1rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .tab-btn.active {
+            border-color: var(--primary);
+            color: var(--primary);
+            background-color: #e8f0ff;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <a href="/" class="header-logo-link">
+            <div class="itmp-logo-placeholder"></div>
+            <span class="header-title">ITMP</span>
+        </a>
+        
+        <div class="header-search">
+            <input type="text" placeholder="Search for jobs..." class="quick-search-input" id="search-input">
+            <button class="btn-search-small" onclick="handleSearch()">Search</button>
+        </div>
+
+        <div class="header-nav">
+            <a href="search_result.html">Browse Jobs</a>
+            <a href="login.html">Sign Out</a>
+        </div>
+    </header>
+
+    <main class="dashboard-main">
+        <div class="dashboard-container">
+            
+            <aside class="dashboard-sidebar">
+                <div class="card profile-card">
+                    <!-- Clicking the profile header navigates to profile.html -->
+                    <a href="profile.html" class="profile-header-link">
+                        <div class="profile-header">
+                            <div class="profile-avatar" id="sidebar-avatar">JD</div>
+                            <h2 id="sidebar-name">Jane Doe</h2>
+                            <p class="profile-headline" id="sidebar-headline">Software Engineer</p>
+                            <span class="badge badge-premium" id="sidebar-premium">Premium Member</span>
+                        </div>
+                    </a>
+                    
+                    <div class="profile-details">
+                        <div class="detail-group">
+                            <strong>Location:</strong>
+                            <p id="profile-location">—</p>
+                        </div>
+                        <div class="detail-group">
+                            <strong>Work Mode:</strong>
+                            <p id="profile-mode">—</p>
+                        </div>
+                        <div class="detail-group">
+                            <strong>Experience:</strong>
+                            <p id="profile-exp">—</p>
+                        </div>
+                        <div class="detail-group">
+                            <strong>Top Skills:</strong>
+                            <div class="skills-wrapper" id="profile-skills"></div>
+                        </div>
+                    </div>
+                    
+                    <a href="profile.html" class="btn-secondary w-100" style="text-align:center;display:block;text-decoration:none;">
+                        View Full Profile
+                    </a>
+                </div>
+            </aside>
+
+            <section class="dashboard-content">
+                
+                <div class="welcome-banner card">
+                    <h1 id="welcome-msg">Welcome back!</h1>
+                    <p>You have <strong id="match-count">0</strong> new highly relevant job matches today.</p>
+                </div>
+
+                <!-- Recommended Jobs -->
+                <div class="dashboard-section">
+                    <div class="section-header">
+                        <h2>Top Recommended Jobs</h2>
+                        <a href="search_result.html" class="view-all">View All</a>
+                    </div>
+                    <div class="job-list" id="job-recommendations-container"></div>
+                    <div class="card empty-state" id="recommend-empty" style="display:none;">
+                        <p>No new recommendations right now — check back soon!</p>
+                    </div>
+                </div>
+
+                <!-- Application History -->
+                <div class="dashboard-section">
+                    <div class="section-header">
+                        <h2>Application History</h2>
+                    </div>
+                    <div class="job-list" id="applied-jobs-container"></div>
+                    <div class="card empty-state" id="applied-empty-state">
+                        <p>You haven't applied to any jobs yet. Your history will appear here.</p>
+                    </div>
+                </div>
+
+                <!-- Saved Jobs -->
+                <div class="dashboard-section">
+                    <div class="section-header">
+                        <h2>Saved Jobs</h2>
+                    </div>
+                    <div class="job-list" id="saved-jobs-container"></div>
+                    <div class="card empty-state" id="saved-empty-state">
+                        <p>Jobs you save will appear here for easy access.</p>
+                    </div>
+                </div>
+
+            </section>
+        </div>
+    </main>
+
+    <footer class="minimal-footer">
+        <div class="footer-links">
+            <a href="#">Terms of Service</a>
+            <a href="#">Privacy Policy</a>
+            <a href="#">Candidate Terms</a>
+        </div>
+        <div class="footer-copyright">
+            &copy; 2026 Intelligent Talent Matching Platform (ITMP). All rights reserved.
+        </div>
+    </footer>
+
+    <script src="../../../back-end/scripting/js-scripts/data.js"></script>
+    <script>
+        // ── Render sidebar profile ────────────────────────────────────
+        function renderSidebar(user) {
+            document.getElementById('sidebar-avatar').textContent   = user.avatar_initials;
+            document.getElementById('sidebar-name').textContent     = user.full_name;
+            document.getElementById('sidebar-headline').textContent = user.headline;
+            document.getElementById('profile-location').textContent = user.location;
+            document.getElementById('profile-mode').textContent     = user.work_mode_preference;
+            document.getElementById('profile-exp').textContent      = `${user.yoe} Year${user.yoe !== 1 ? 's' : ''}`;
+            document.getElementById('welcome-msg').textContent      = `Welcome back, ${user.full_name.split(' ')[0]}!`;
+
+            if (!user.is_premium) {
+                document.getElementById('sidebar-premium').style.display = 'none';
+            }
+
+            const skillsEl = document.getElementById('profile-skills');
+            // Show top 4 skills
+            skillsEl.innerHTML = user.skills.slice(0, 4).map(s =>
+                `<span class="skill-tag">${s}</span>`
+            ).join('');
+        }
+
+        // ── Build a job card ──────────────────────────────────────────
+        function buildJobCard(job, mode) {
+            // mode: 'recommend' | 'applied' | 'saved'
+            const skillsHtml = job.skills.map(skill => {
+                const userSkills = (DataService.getCurrentUser()?.skills ?? []).map(s => s.toLowerCase());
+                const isMatch    = userSkills.includes(skill.name.toLowerCase());
+                return `<span class="skill-tag ${isMatch ? 'match' : ''}">${skill.name}</span>`;
+            }).join('');
+
+            let actionButtonsHtml = '';
+            if (mode === 'applied') {
+                actionButtonsHtml = `
+                    <button class="btn-applied" disabled>
+                        <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="3"
+                             fill="none" stroke-linecap="round" stroke-linejoin="round" style="margin-right:5px;">
+                            <polyline points="20 6 9 17 4 12"></polyline>
+                        </svg>
+                        Applied
+                    </button>
+                    <a href="job.html?id=${job.id}" class="btn-text" style="color:#004a99;">View Job</a>
+                `;
+            } else if (mode === 'saved') {
+                actionButtonsHtml = `
+                    <button class="btn-primary btn-sm" onclick="handleApply('${job.id}')">One-Click Apply</button>
+                    <button class="btn-text" onclick="handleUnsave('${job.id}')">Remove from Saved</button>
+                `;
+            } else {
+                // recommend
+                actionButtonsHtml = `
+                    <button class="btn-primary btn-sm btn-apply" onclick="handleApply('${job.id}')">One-Click Apply</button>
+                    <button class="btn-text" onclick="handleSave('${job.id}')">Save for later</button>
+                `;
+            }
+
+            const card = document.createElement('div');
+            card.className = 'card job-card';
+            card.innerHTML = `
+                <div class="job-card-header">
+                    <div>
+                        <a href="job.html?id=${job.id}" class="job-card-title-link">
+                            <h3>${job.title}</h3>
+                        </a>
+                        <p class="company-name">${job.company}</p>
+                    </div>
+                    <div class="match-score">${job.match_score}% Match</div>
+                </div>
+                <div class="job-card-body">
+                    <p class="job-meta">📍 ${job.location} (${job.work_mode}) &nbsp;|&nbsp; 💰 ${job.salary_display}</p>
+                    <p class="job-desc">${job.description}</p>
+                    <div class="skills-wrapper">${skillsHtml}</div>
+                </div>
+                <div class="job-card-actions">${actionButtonsHtml}</div>
+            `;
+            return card;
+        }
+
+        // ── Main render ───────────────────────────────────────────────
+        function renderDashboard() {
+            DataService.onReady(() => {
+                const user = DataService.getCurrentUser();
+                if (user) renderSidebar(user);
+
+                const recommended = DataService.getRecommendedJobs();
+                const applied     = DataService.getAppliedJobs();
+                const saved       = DataService.getSavedJobs();
+
+                // Recommended
+                const recContainer   = document.getElementById('job-recommendations-container');
+                const recEmpty       = document.getElementById('recommend-empty');
+                recContainer.innerHTML = '';
+                if (recommended.length === 0) {
+                    recEmpty.style.display = 'block';
+                } else {
+                    recEmpty.style.display = 'none';
+                    recommended.forEach(job => recContainer.appendChild(buildJobCard(job, 'recommend')));
+                }
+                document.getElementById('match-count').textContent = recommended.length;
+
+                // Applied
+                const appContainer  = document.getElementById('applied-jobs-container');
+                const appEmpty      = document.getElementById('applied-empty-state');
+                appContainer.innerHTML = '';
+                if (applied.length === 0) {
+                    appEmpty.style.display = 'block';
+                } else {
+                    appEmpty.style.display = 'none';
+                    applied.forEach(job => appContainer.appendChild(buildJobCard(job, 'applied')));
+                }
+
+                // Saved
+                const savedContainer = document.getElementById('saved-jobs-container');
+                const savedEmpty     = document.getElementById('saved-empty-state');
+                savedContainer.innerHTML = '';
+                if (saved.length === 0) {
+                    savedEmpty.style.display = 'block';
+                } else {
+                    savedEmpty.style.display = 'none';
+                    saved.forEach(job => savedContainer.appendChild(buildJobCard(job, 'saved')));
+                }
+            });
+        }
+
+        // ── Actions ───────────────────────────────────────────────────
+        function handleApply(jobId) {
+            DataService.applyForJob(jobId);
+            renderDashboard();
+        }
+
+        function handleSave(jobId) {
+            DataService.toggleSaveJob(jobId);
+            renderDashboard();
+        }
+
+        function handleUnsave(jobId) {
+            DataService.toggleSaveJob(jobId); // toggles off if already saved
+            renderDashboard();
+        }
+
+        function handleSearch() {
+            const q = document.getElementById('search-input').value.trim();
+            if (q) window.location.href = `search_result.html?q=${encodeURIComponent(q)}`;
+        }
+
+        document.getElementById('search-input').addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') handleSearch();
+        });
+
+        // ── Boot ──────────────────────────────────────────────────────
+        document.addEventListener('DOMContentLoaded', renderDashboard);
+    </script>
+</body>
+</html>

@@ -1,0 +1,238 @@
+/* ==========================================================================
+   GLOBAL DESIGN TOKENS (VARIABLES)
+   ========================================================================== */
+:root {
+    /* Colors */
+    --bg-main: #f5f5f5;
+    --text-main: #1a1d21;
+    --text-muted: #666;
+    
+    /* Brand Colors */
+    --primary: #004a99;
+    --primary-light: #0056b3;
+    --primary-hover: #004085;
+    --bg-light-hover: #f0f7ff;
+    
+    /* UI Element Colors */
+    --border-color: #ccc;
+    --border-light: #e0e0e0;
+    --success: #008a00;
+    
+    /* Footer Colors */
+    --footer-bg: #080d14;
+    --footer-text: #d1d5db;
+    --footer-text-muted: #8b929c;
+    
+    /* Spacing & Radii */
+    --shadow-card: 0 4px 15px rgba(0,0,0,0.1);
+    --radius-card: 10px;
+    --radius-btn: 5px;
+}
+
+/* ==========================================================================
+   GLOBAL RESET & TYPOGRAPHY
+   ========================================================================== */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: Arial, Helvetica, sans-serif;
+    background-color: var(--bg-main); 
+    color: var(--text-main); 
+    line-height: 1.5;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+h1 {
+    font-size: 2.5rem;
+    margin-bottom: 2rem;
+    text-align: center;
+}
+
+a {
+    text-decoration: none;
+    color: inherit;
+    transition: color 0.3s;
+}
+
+/* ==========================================================================
+   GLOBAL HEADER
+   ========================================================================== */
+header {
+    background-color: var(--primary); 
+    color: white;
+    padding: 1rem 3rem;
+    display: flex;
+    justify-content: flex-start; 
+    align-items: center;
+}
+
+.header-logo-link {
+    display: flex;
+    align-items: center;
+    color: white;
+    text-decoration: none;
+    transition: opacity 0.3s;
+}
+
+.header-logo-link:hover {
+    opacity: 0.8; 
+}
+
+.itmp-logo-placeholder {
+    width: 50px; 
+    height: 50px; 
+    background-color: var(--border-color); 
+    border-radius: var(--radius-btn);
+    display: inline-block;
+    margin-right: 1rem;
+}
+
+.header-title {
+    font-size: 1.25rem;
+    font-weight: bold;
+}
+
+/* ==========================================================================
+   GLOBAL LAYOUT & COMPONENTS
+   ========================================================================== */
+main {
+    flex-grow: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 2rem;
+}
+
+.card {
+    background-color: white;
+    padding: 2.5rem;
+    border-radius: var(--radius-card);
+    box-shadow: var(--shadow-card);
+    width: 100%;
+}
+
+/* ==========================================================================
+   GLOBAL FORMS & INPUTS
+   ========================================================================== */
+.input-group {
+    margin-bottom: 1.5rem;
+}
+
+.input-group label {
+    display: block;
+    font-weight: bold;
+    margin-bottom: 0.5rem;
+    font-size: 0.95rem;
+}
+
+.input-group input,
+.input-group select,
+.input-group textarea {
+    width: 100%;
+    padding: 0.85rem;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-btn);
+    font-size: 1rem;
+    font-family: inherit;
+    transition: border-color 0.3s;
+    background-color: white;
+}
+
+.input-group input:focus,
+.input-group select:focus,
+.input-group textarea:focus {
+    outline: none;
+    border-color: var(--primary); 
+}
+
+.hint-text {
+    display: block;
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    margin-top: 0.25rem;
+}
+
+/* ==========================================================================
+   GLOBAL BUTTONS
+   ========================================================================== */
+.btn-primary {
+    width: 100%;
+    background-color: var(--primary-light); 
+    color: white;
+    border: none;
+    padding: 1rem;
+    font-size: 1.125rem;
+    font-weight: bold;
+    border-radius: var(--radius-btn);
+    cursor: pointer;
+    transition: background 0.3s;
+    margin-top: 1rem;
+}
+
+.btn-primary:hover {
+    background-color: var(--primary-hover); 
+}
+
+/* ==========================================================================
+   GLOBAL FOOTER
+   ========================================================================== */
+.minimal-footer {
+    background-color: var(--footer-bg); 
+    height: 100px; 
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 0 1rem;
+}
+
+.footer-links {
+    display: flex;
+    gap: 1.5rem;
+    margin-bottom: 0.5rem;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.footer-links a {
+    color: var(--footer-text); 
+    font-size: 0.9rem;
+}
+
+.footer-links a:hover {
+    color: white;
+    text-decoration: underline;
+}
+
+.footer-copyright {
+    color: var(--footer-text-muted); 
+    font-size: 0.85rem;
+    text-align: center;
+}
+
+/* ==========================================================================
+   GLOBAL UTILITIES & ANIMATIONS
+   ========================================================================== */
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+.reveal-container {
+    max-height: 0;
+    opacity: 0;
+    overflow: hidden;
+    transition: max-height 0.5s ease-out, opacity 0.5s ease-out; 
+}
+
+.reveal-container.show {
+    max-height: 1800px; 
+    opacity: 1;
+    margin-top: 1rem;
+}

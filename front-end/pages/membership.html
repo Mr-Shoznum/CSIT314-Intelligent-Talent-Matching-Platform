@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <!--No JS yet, but figured id make a file anyways and reference it-->
+        <script src="home.js"></script>
+        <link rel="stylesheet" href="../assests/styling/upgrade-membership.css">
+        <link rel="stylesheet" href="../assests/styling/footer.css">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+        <title>Intelligent Talent Matching Platform</title>
+        <link rel="icon" type="image/x-icon" href="../assests/images/ITMP-icon-logo.ico">
+    </head>
+    <body>
+        <div class="page-content">
+            <!--Top navigation-->
+            <header>
+                <div class="header-content">
+                    <img src="../assests/images/ITMP-clear-header-logo.png" alt="ITMP Logo">
+                </div>
+                <div class="header-divider"></div>
+                <nav>
+                    <button>Sign up</button>
+                    <button>Login</button>
+                </nav>
+            </header>
+
+            <div class="membership-title">
+                <img src="../assests/images/ITMP-clear-header-logo.png" alt="ITMP Logo">
+                <span class="upgrade-text">+ PLUS</span>
+            </div>
+
+            <div class="listing-title">
+                <h2>With ITMP Plus you can get access to unlimited job searches and candidate matching alongside exlcusive benefits</h2>
+                <br>
+                <list>
+                    <li>Unlimited job searches and candidate matching</li>
+                    <li>Access to exclusive webinars and workshops</li>
+                    <li>Priority customer support</li>
+                    <li>Early access to new features and updates</li>
+                </list>
+            </div>
+
+        <!--memberhsip options-->
+            <div class="membership-listings">
+                <div class="listing-card">
+                    <h1>Weekly</h1>
+                    <h3>$12/ week</h3>
+                        <button>Purchase now</button>
+                </div>
+
+                <div class="listing-card">
+                    <h1>Monthly</h1>
+                    <h3>$45/ month</h3>
+                    <button>Purchase now</button>
+                </div>
+
+                <div class="listing-card">
+                    <span class="best-value-badge">BEST VALUE</span>
+                    <h1>Yearly</h1>
+                    <h3>$450/ year</h3>
+                    <button>Purchase now</button>
+                </div>
+            </div>
+
+            <div class="listing-title">
+                <br> 
+                <!-- Blank spacing -->
+            </div>
+
+            <footer>
+                <div class="footer-container">
+                    
+                    <div class="footer-content">
+                        
+                        <!-- Left: Brand -->
+                        <div class="footer-brand">
+                            <div class="footer-logo"></div>
+                            <div>
+                                <h2>ITMP</h2>
+                                <p>Intelligent Talent Matching Platform</p>
+                            </div>
+                        </div>
+
+                        <!-- Center: Legal Links -->
+                        <div class="footer-links">
+                            <a href="#" class="footer-link">Terms of Service</a>
+                            <a href="#" class="footer-link">Privacy Policy</a>
+                            <a href="#" class="footer-link">Cookie Policy</a>
+                            <a href="#" class="footer-link">Candidate Terms</a>
+                            <a href="#" class="footer-link">Employer Terms</a>
+                            <a href="#" class="footer-link">Licenses</a>
+                        </div>
+
+                        <!-- Right: Social Icons -->
+                        <div class="footer-social">
+                            <a href="#" aria-label="YouTube">
+                                <i class="fa-brands fa-youtube"></i>
+                            </a>
+                            <a href="#" aria-label="Facebook">
+                                <i class="fa-brands fa-facebook"></i>
+                            </a>
+                            <a href="#" aria-label="Instagram">
+                                <i class="fa-brands fa-instagram"></i>
+                            </a>
+                            <a href="#" aria-label="LinkedIn">
+                                <i class="fa-brands fa-linkedin"></i>
+                            </a>
+                            <a href="#" aria-label="X (Twitter)">
+                                <i class="fa-brands fa-x-twitter"></i>
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- Bottom Bar -->
+                    <div class="footer-bottom">
+                        <div>
+                            © 2026 Intelligent Talent Matching Platform (ITMP). All rights reserved.
+                        </div>
+                        <div class="footer-bottom-right">
+                            <a href="#">Accessibility</a>
+                            <a href="#">Sitemap</a>
+                            <a href="#">Contact Support</a>
+                        </div>
+                    </div>
+
+                </div>
+            </footer>
+        </div>
+
+        <!-- Modal Overlay -->
+        <div id="modal-overlay" class="modal-overlay hidden">
+            <script src="../../back-end/scripting/js-scripts/modal-script.js"></script>
+
+            <link rel="stylesheet" href="../assests/styling/modal-style.css">
+
+            <div class="modal-container">
+                <div class="modal-content">
+                    <h2 class="modal-title">Sign up or log in</h2>
+                    <p id="modal-message" class="modal-message">
+                        Please sign up or log in to view the job position
+                    </p>
+                    
+                    <div class="modal-buttons">
+                        <button class="modal-btn signup-btn" onclick="handleAction('signup')">Sign Up</button>
+                        <button class="modal-btn login-btn" onclick="handleAction('login')">Log In</button>
+                    </div>
+                    
+                    <button class="modal-close" onclick="closeModal()">Not now</button>
+                </div>
+            </div>
+        </div>
+    
+
+       
+
+
+        
+    </body>
+</html>
