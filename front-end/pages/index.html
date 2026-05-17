@@ -82,35 +82,19 @@
             </div>
 
         <!--Job listings displayed on main page-->
-            <div class="listings">
-                <div class="listing-card">
-                    <h3>Software Engineer</h3>
-                    <p>Location: Sydney</p>
-                    <p>Contract: Full-time</p>
-                    <p>Work from: Remote</p>
-                    <p>Pay: $90,000+</p>
-                    <button onclick="openModal('job')">View Details</button>
-                </div>
+        <!--turned into a container which will hold the job cards and to be used in the home.js-->
+            <div class="listings" id="jobs-listings"></div>
 
-                <div class="listing-card">
-                    <h3>Data Analyst</h3>
-                    <p>Location: Melbourne</p>
-                    <p>Contract: Part-time</p>
-                    <p>Work from: In-person</p>
-                    <p>Pay: $70,000+</p>
-                    <button onclick="openModal('job')">View Details</button>
+            <!--Membership upgrade banner, so when user clicks on upgrade button, it will redirect them to the membership page-->
+            <div class="membership-banner" id="membership-upgrade-banner">
+                <div class="membership-banner-inner">
+                    <span class="banner-icon">⭐</span>
+                    <div class="banner-text">
+                        <strong>Get more matches with premium.</strong>
+                        <span>Upgrade to see more jobs and candidates instead of only 3.</span>
+                    </div>
+                    <a class="banner-button" href="membership.html">Upgrade now</a>
                 </div>
-
-                <div class="listing-card">
-                    <h3>Project Manager</h3>
-                    <p>Location: Brisbane</p>
-                    <p>Contract: Full-time</p>
-                    <p>Work from: Hybrid</p>
-                    <p>Pay: $110,000+</p>
-                    <button onclick="openModal('job')">View Details</button>
-                </div>
-
-                <!--More jobs can be added here if we want-->
             </div>
 
 
@@ -120,35 +104,7 @@
             </div>
 
         <!--Employees listings displayed on main page-->
-            <div class="listings">
-                <div class="listing-card">
-                    <h3>Software Engineer</h3>
-                    <p>Location: Sydney</p>
-                    <p>Status: unemployed</p>
-                    <p>Skills: ...</p>
-                    <p>Previous Employment: ...+</p>
-                    <button onclick="openModal('job')">Reach Out</button>
-                </div>
-
-                <div class="listing-card">
-                    <h3>Cyber Security Analyst</h3>
-                    <p>Location: Wollongong</p>
-                    <p>Status: Casual</p>
-                    <p>Skills: ...</p>
-                    <p>Previous Employment: ...</p>
-                    <button onclick="openModal('job')">Reach Out</button>
-                </div>
-
-                <div class="listing-card">
-                    <h3>AI Engineer</h3>
-                    <p>Location: Brisbane</p>
-                    <p>Status: Part-time</p>
-                    <p>Skills: ...</p>
-                    <p>Previous Employment: ...</p>
-                    <button onclick="openModal('job')">Reach Out</button>
-                </div>
-                <!--More jobs can be added here if we want-->
-            </div>
+            <div class="listings" id="candidates-listings"></div>
 
             <div class="listing-title">
                 <br> 
