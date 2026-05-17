@@ -260,7 +260,11 @@ const DataService = (() => {
 
     function _getSessionUserId() {
         const r = localStorage.getItem(SESSION_KEY);
-        return r ? parseInt(r, 10) : 1;
+        // changed this to null since it returned users as "1" meaning logged in, because anonymous users can see all the listing cards even when not logged in
+        // - Jordan P
+        return r ? parseInt(r, 10) : null;
+        // comment the above code and uncomment the one below to see the premium home page version without logging in (for demo purposes)
+        // return r ? parseInt(r, 10) : 1;
     }
 
     // ── Init ──────────────────────────────────────────────────────────
