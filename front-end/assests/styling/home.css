@@ -150,3 +150,89 @@ nav button:hover {
     opacity: 0.9;
 }
 
+.membership-banner {
+    max-width: 1000px;
+    margin: 30px auto 10px;
+    padding: 18px 24px;
+    border-radius: 16px;
+    background: linear-gradient(135deg, #eef6ff 0%, #ffffff 100%);
+    border: 1px solid #cfe3f8;
+    box-shadow: 0 12px 30px rgba(3, 74, 150, 0.08);
+    color: #0f2f5b;
+}
+
+.membership-banner-inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 18px;
+    flex-wrap: wrap;
+}
+
+.banner-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background-color: #0A57A9;
+    color: white;
+    font-size: 1.2rem;
+}
+
+.banner-text {
+    flex: 1;
+    min-width: 220px;
+}
+
+.banner-text strong {
+    display: block;
+    margin-bottom: 4px;
+    font-size: 1rem;
+}
+
+.banner-text span {
+    color: #2e4d7a;
+    opacity: 0.9;
+    font-size: 0.95rem;
+}
+
+.banner-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #0A57A9;
+    color: white;
+    text-decoration: none;
+    padding: 11px 20px;
+    border-radius: 10px;
+    font-weight: 700;
+    transition: background-color 0.2s ease, transform 0.2s ease;
+}
+
+.banner-button:hover {
+    background-color: #084187;
+    transform: translateY(-1px);
+}
+
+@media (max-width: 860px) {
+    .listings {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 640px) {
+    .listings {
+        grid-template-columns: 1fr;
+    }
+
+    .membership-banner-inner {
+        align-items: flex-start;
+        text-align: left;
+    }
+
+    .banner-button {
+        width: 100%;
+    }
+}
