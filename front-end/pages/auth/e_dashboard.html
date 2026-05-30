@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Employer Dashboard - ITMP</title>
+    <link rel="stylesheet" href="../../assests/styling/global.css">
+    <link rel="stylesheet" href="../../assests/styling/dashboard.css">
+    <style>
+        /* Profile card clickable (matches c_dashboard) */
+        .profile-header-link {
+            display: block; text-decoration: none; color: inherit; cursor: pointer;
+            border-radius: var(--radius-card); transition: background 0.2s;
+            padding: 0.5rem; margin: -0.5rem -0.5rem 0;
+        }
+        .profile-header-link:hover .profile-avatar { background-color: var(--primary-hover); }
+        .profile-header-link:hover h2 { color: var(--primary); }
+
+        .badge-verified { background-color: #e8f0ff; color: var(--primary); }
+
+        /* ── Candidate card (shared visual language w/ search_result) ── */
+        .candidate-card { padding: 1.5rem; }
+        .cc-top { display: flex; gap: 1rem; align-items: flex-start; }
+        .cc-avatar {
+            width: 56px; height: 56px; border-radius: 50%;
+            color: white; font-weight: bold; font-size: 1.1rem;
+            display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+            background: var(--primary);
+        }
+        .cc-info { flex: 1; }
+        .cc-name { font-size: 1.05rem; font-weight: bold; }
+        .cc-name a { color: var(--text-main); text-decoration: none; }
+        .cc-name a:hover { color: var(--primary); text-decoration: underline; }
+        .cc-headline { font-size: 0.9rem; color: var(--text-muted); margin: 0.15rem 0; }
+        .cc-meta { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 0.5rem; }
+        .meta-tag {
+            font-size: 0.8rem; background: var(--bg-light-hover);
+            padding: 0.25rem 0.65rem; border-radius: 20px; color: var(--text-muted); font-weight: bold;
+        }
+        .cc-skills { display: flex; flex-wrap: wrap; gap: 0.4rem; margin: 0.9rem 0; }
+        .cc-actions {
+            display: flex; gap: 0.75rem; align-items: center; flex-wrap: wrap;
+            padding-top: 1rem; border-top: 1px solid var(--border-light);
+        }
+        .open-to-work-inline { font-size: 0.78rem; color: var(--success); font-weight: bold; margin-left: 0.5rem; }
+        .open-to-work-dot { display: inline-block; width: 8px; height: 8px; background: var(--success); border-radius: 50%; margin-right: 4px; }
+        .avail-badge { padding: 0.25rem 0.7rem; border-radius: 20px; font-size: 0.78rem; font-weight: bold; }
+        .avail-immediate { background: #e6ffe6; color: var(--success); border: 1px solid var(--success); }
+        .avail-twoweeks  { background: #fff8e6; color: #b08000; border: 1px solid #f0c040; }
+        .avail-month     { background: #f0f0f0; color: #555; border: 1px solid #ccc; }
+        .profile-views { margin-left: auto; font-size: 0.8rem; color: var(--text-muted); }
+        .btn-saved-active { color: var(--primary) !important; }
+
+        /* ── Posting card ─────────────────────────────────────────── */
+        .posting-card { padding: 1.5rem; }
+        .posting-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 1rem; }
+        .posting-title { font-size: 1.1rem; font-weight: bold; }
+        .posting-title a { color: var(--primary); text-decoration: none; }
+        .posting-title a:hover { text-decoration: underline; }
+        .posting-meta { display: flex; flex-wrap: wrap; gap: 0.5rem; margin: 0.6rem 0; }
+        .posting-actions {
+            display: flex; gap: 0.75rem; align-items: center; flex-wrap: wrap;
+            margin-top: 1rem; padding-top: 1rem; border-top: 1px solid var(--border-light);
+        }
+        .status-pill { padding: 0.3rem 0.85rem; border-radius: 20px; font-size: 0.78rem; font-weight: bold; white-space: nowrap; }
+        .status-open   { background: #e6ffe6; color: var(--success); border: 1px solid var(--success); }
+        .status-closed { background: #f0f0f0; color: #555; border: 1px solid #ccc; }
+        .applicant-count {
+            font-weight: bold; color: var(--primary); font-size: 0.9rem;
+            background: var(--bg-light-hover); padding: 0.3rem 0.85rem; border-radius: 20px;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <a href="e_dashboard.html" class="header-logo-link">
+            <div class="itmp-logo-placeholder">
+                <img src="../../assests/images/ITMP.png" style="max-width: 100px;">
+            </div>
+            <!--<span class="header-title">ITMP</span>-->
+        </a>
+
+        <div class="header-search">
+            <input type="text" placeholder="Search for candidates..." class="quick-search-input" id="search-input">
+            <button class="btn-search-small" onclick="handleSearch()">Search</button>
+        </div>
+
+        <div class="header-nav">
+            <a href="search_result.html?mode=candidates&role=employer">Browse Candidates</a>
+            <a href="#" onclick="DataService.logout();return false;">Sign Out</a>
+        </div>
+    </header>
+
+    <main class="dashboard-main">
+        <div class="dashboard-container">
+
+            <!-- ── Sidebar: company profile ───────────────────────── -->
+            <aside class="dashboard-sidebar">
+                <div class="card profile-card">
+                    <a href="e_edit_profile.html" class="profile-header-link" id="company-profile-link">
+                        <div class="profile-header">
+                            <div class="profile-avatar" id="sidebar-avatar">AT</div>
+                            <h2 id="sidebar-name">Acme Technologies</h2>
+                            <p class="profile-headline" id="sidebar-headline">Software / SaaS</p>
+                            <span class="badge badge-verified" id="sidebar-verified">✔ Verified Employer</span>
+                            <span class="badge badge-premium" id="sidebar-premium">Premium Member</span>
+                        </div>
+                    </a>
+
+                    <div class="profile-details">
+                        <div class="detail-group">
+                            <strong>Location:</strong>
+                            <p id="company-location">—</p>
+                        </div>
+                        <div class="detail-group">
+                            <strong>Industry:</strong>
+                            <p id="company-industry">—</p>
+                        </div>
+                        <div class="detail-group">
+                            <strong>Company Size:</strong>
+                            <p id="company-size">—</p>
+                        </div>
+                        <div class="detail-group">
+                            <strong>Open Roles:</strong>
+                            <p id="company-open-roles">—</p>
+                        </div>
+                    </div>
+
+                    <a href="create_job.html" class="btn-primary w-100" id="post-job-btn"
+                       style="text-align:center;display:block;text-decoration:none;">
+                        + Post a New Job
+                    </a>
+                    <a href="e_edit_profile.html" class="btn-secondary w-100"
+                       style="text-align:center;display:block;text-decoration:none;margin-top:0.75rem;">
+                        View Company Profile
+                    </a>
+                </div>
+            </aside>
+
+            <!-- ── Content ─────────────────────────────────────────── -->
+            <section class="dashboard-content">
+
+                <div class="welcome-banner card">
+                    <h1 id="welcome-msg">Welcome back!</h1>
+                    <p>You have <strong id="match-count">0</strong> recommended candidate matches
+                       and <strong id="applicant-count">0</strong> new applicants.</p>
+                </div>
+
+                <!-- Recommended Candidates (LIVE via searchCandidates) -->
+                <div class="dashboard-section">
+                    <div class="section-header">
+                        <h2>Recommended Candidates</h2>
+                        <a href="search_result.html?mode=candidates&role=employer" class="view-all">View All</a>
+                    </div>
+                    <div class="job-list" id="recommended-candidates-container"></div>
+                    <div class="card empty-state" id="recommended-empty" style="display:none;">
+                        <p>No candidate matches right now — try broadening your search.</p>
+                    </div>
+                </div>
+
+                <!-- Your Job Postings -->
+                <div class="dashboard-section">
+                    <div class="section-header">
+                        <h2>Your Job Postings</h2>
+                        <a href="#" class="view-all" id="manage-postings">Manage</a>
+                    </div>
+                    <div class="job-list" id="postings-container"></div>
+                    <div class="card empty-state" id="postings-empty">
+                        <p>You haven't posted any jobs yet. Post your first role to start matching with candidates.</p>
+                    </div>
+                </div>
+
+                <!-- Recent Applicants -->
+                <div class="dashboard-section">
+                    <div class="section-header">
+                        <h2>Recent Applicants</h2>
+                    </div>
+                    <div class="job-list" id="applicants-container"></div>
+                    <div class="card empty-state" id="applicants-empty">
+                        <p>No applicants yet. Applicants to your roles will appear here.</p>
+                    </div>
+                </div>
+
+                <!-- Saved Candidates -->
+                <div class="dashboard-section">
+                    <div class="section-header">
+                        <h2>Saved Candidates</h2>
+                    </div>
+                    <div class="job-list" id="saved-candidates-container"></div>
+                    <div class="card empty-state" id="saved-empty">
+                        <p>Candidates you save will appear here for easy access.</p>
+                    </div>
+                </div>
+
+            </section>
+        </div>
+    </main>
+
+    <footer class="minimal-footer">
+        <div class="footer-links">
+            <a href="#">Terms of Service</a>
+            <a href="#">Privacy Policy</a>
+            <a href="#">Employer Terms</a>
+        </div>
+        <div class="footer-copyright">
+            &copy; 2026 Intelligent Talent Matching Platform (ITMP). All rights reserved.
+        </div>
+    </footer>
+
+    <script src="../../assests/js/data.js"></script>
+    <script>
+        /* ===================================================================
+           EMPLOYER DASHBOARD
+           Live data: DataService.searchCandidates() (already in data.js).
+           Optional employer-side methods (used if present, safe fallback if not):
+             DataService.getCurrentEmployer()      -> employer object
+             DataService.getPostedJobs()           -> [job, ...]
+             DataService.getApplicants()           -> [candidate, ...]
+             DataService.getSavedCandidates()      -> [candidate, ...]
+             DataService.toggleSaveCandidate(id)   -> bool
+           See the note block at the bottom for the expected shapes.
+           =================================================================== */
+
+        // In-page saved set so Save/Unsave gives immediate feedback even before
+        // an employer API exists in data.js.
+        const savedCandidateIds = new Set();
+
+        const FALLBACK_EMPLOYER = {
+            company_name: 'Acme Technologies',
+            avatar_initials: 'AT',
+            industry: 'Software / SaaS',
+            location: 'Sydney, NSW',
+            company_size: '201–500 employees',
+            is_verified: true,
+            is_premium: true,
+            target_skills: []
+        };
+
+        // ── Helpers ───────────────────────────────────────────────────
+        function nameSlug(name) {
+            return (name || '').toLowerCase().trim().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+        }
+        function candidateId(c) {
+            return c.id != null ? c.id : nameSlug(c.full_name);
+        }
+        function availClass(a) {
+            return a === 'Immediate' ? 'avail-immediate'
+                 : a === '2 weeks'  ? 'avail-twoweeks'
+                 : 'avail-month';
+        }
+        function getEmployer() {
+            return (DataService.getCurrentEmployer && DataService.getCurrentEmployer())
+                || FALLBACK_EMPLOYER;
+        }
+        function getAllCandidates() {
+            return (DataService.searchCandidates && DataService.searchCandidates({})) || [];
+        }
+        function resolveCandidate(id) {
+            if (DataService.getCandidateById) {
+                const c = DataService.getCandidateById(id);
+                if (c) return c;
+            }
+            const all = getAllCandidates();
+            return all.find(c => String(candidateId(c)) === String(id)) || null;
+        }
+
+        // ── Sidebar (company) ─────────────────────────────────────────
+        function renderSidebar(emp) {
+            document.getElementById('sidebar-avatar').textContent  = emp.avatar_initials
+                || (emp.company_name || '?').split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase();
+            document.getElementById('sidebar-name').textContent     = emp.company_name || '—';
+            document.getElementById('sidebar-headline').textContent = emp.industry || '—';
+            document.getElementById('company-location').textContent = emp.location || '—';
+            document.getElementById('company-industry').textContent = emp.industry || '—';
+            document.getElementById('company-size').textContent     = emp.company_size || '—';
+            document.getElementById('welcome-msg').textContent =
+                `Welcome back, ${(emp.company_name || 'there').split(' ')[0]}!`;
+
+            if (!emp.is_verified) document.getElementById('sidebar-verified').style.display = 'none';
+            if (!emp.is_premium)  document.getElementById('sidebar-premium').style.display  = 'none';
+        }
+
+        // ── Build a candidate card ────────────────────────────────────
+        function buildCandidateCard(c, mode) {
+            // mode: 'recommend' | 'applicant' | 'saved'
+            const id        = candidateId(c);
+            const empSkills = (getEmployer().target_skills || []).map(s => s.toLowerCase());
+            const skillsHtml = (c.skills || []).slice(0, 6).map(s => {
+                const isMatch = empSkills.includes(String(s).toLowerCase());
+                return `<span class="skill-tag ${isMatch ? 'match' : ''}">${s}</span>`;
+            }).join('');
+
+            const openTag = c.open_to_work
+                ? `<span class="open-to-work-inline"><span class="open-to-work-dot"></span>Open to work</span>`
+                : '';
+
+            const isSaved = savedCandidateIds.has(String(id));
+            const saveBtn = mode === 'saved'
+                ? `<button class="btn-text" onclick="handleUnsaveCandidate('${id}')">Remove from Saved</button>`
+                : `<button class="btn-text ${isSaved ? 'btn-saved-active' : ''}" id="save-${id}"
+                       onclick="handleSaveCandidate('${id}')">${isSaved ? '★ Saved' : '☆ Save'}</button>`;
+
+            const primaryBtn = mode === 'applicant'
+                ? `<a href="view_profile.html?id=${id}" class="btn-primary btn-sm" style="text-decoration:none;">Review Application</a>`
+                : `<button class="btn-primary btn-sm" onclick="handleInvite('${id}')">Invite to Apply</button>`;
+
+            const card = document.createElement('div');
+            card.className = 'card candidate-card';
+            card.innerHTML = `
+                <div class="cc-top">
+                    <div class="cc-avatar" style="background:${c.avatar_color || 'var(--primary)'}">${c.avatar_initials || ''}</div>
+                    <div class="cc-info">
+                        <div class="cc-name">
+                            <a href="view_profile.html?id=${id}">${c.full_name}</a>${openTag}
+                        </div>
+                        <div class="cc-headline">${c.headline || ''}</div>
+                        <div class="cc-meta">
+                            <span class="meta-tag">📍 ${c.location || '—'}</span>
+                            <span class="meta-tag">🖥️ ${c.work_mode_preference || '—'}</span>
+                            <span class="meta-tag">💼 ${c.yoe ?? '—'} yrs exp</span>
+                            ${c.availability ? `<span class="avail-badge ${availClass(c.availability)}">⏱ ${c.availability}</span>` : ''}
+                        </div>
+                    </div>
+                </div>
+                <div class="cc-skills">${skillsHtml}</div>
+                <div class="cc-actions">
+                    ${primaryBtn}
+                    <a href="view_profile.html?id=${id}" class="btn-secondary btn-sm" style="text-decoration:none;">View Profile</a>
+                    ${saveBtn}
+                    ${c.profile_views != null ? `<span class="profile-views">👁 ${c.profile_views} profile views</span>` : ''}
+                </div>
+            `;
+            return card;
+        }
+
+        // ── Build a job posting card ──────────────────────────────────
+        function buildPostingCard(job) {
+            const status = (job.status || 'Open');
+            const statusClass = /clos/i.test(status) ? 'status-closed' : 'status-open';
+            const card = document.createElement('div');
+            card.className = 'card posting-card';
+            card.innerHTML = `
+                <div class="posting-top">
+                    <div>
+                        <div class="posting-title"><a href="view_job.html?id=${job.id}">${job.title}</a></div>
+                        <div class="posting-meta">
+                            <span class="meta-tag">📍 ${job.location || '—'}</span>
+                            <span class="meta-tag">🖥️ ${job.work_mode || '—'}</span>
+                            <span class="meta-tag">💼 ${job.job_type || '—'}</span>
+                            ${job.posted_date && DataService.timeAgo ? `<span class="meta-tag">📅 ${DataService.timeAgo(job.posted_date)}</span>` : ''}
+                        </div>
+                    </div>
+                    <span class="status-pill ${statusClass}">${status}</span>
+                </div>
+                <div class="posting-actions">
+                    <span class="applicant-count">👥 ${job.applications_count ?? 0} applicants</span>
+                    <a href="view_job.html?id=${job.id}" class="btn-secondary btn-sm" style="text-decoration:none;">View Listing</a>
+                    <a href="search_result.html?mode=candidates&role=employer" class="btn-text" style="margin-left:auto;">Find matches →</a>
+                </div>
+            `;
+            return card;
+        }
+
+        // ── Section renderers ─────────────────────────────────────────
+        function fillSection(containerId, emptyId, items, builder) {
+            const container = document.getElementById(containerId);
+            const empty     = document.getElementById(emptyId);
+            container.innerHTML = '';
+            if (!items || items.length === 0) {
+                empty.style.display = 'block';
+                return;
+            }
+            empty.style.display = 'none';
+            items.forEach(item => container.appendChild(builder(item)));
+        }
+
+        function renderDashboard() {
+            DataService.onReady(() => {
+                const emp = getEmployer();
+                renderSidebar(emp);
+
+                // Recommended candidates — real data
+                const recommended = getAllCandidates().slice(0, 4);
+                fillSection('recommended-candidates-container', 'recommended-empty',
+                            recommended, c => buildCandidateCard(c, 'recommend'));
+                document.getElementById('match-count').textContent = recommended.length;
+
+                // Posted jobs — optional API
+                const postings = (DataService.getPostedJobs && DataService.getPostedJobs()) || [];
+                fillSection('postings-container', 'postings-empty', postings, buildPostingCard);
+                document.getElementById('company-open-roles').textContent =
+                    postings.length ? `${postings.length} active` : '0';
+
+                // Recent applicants — optional API
+                const applicants = (DataService.getApplicants && DataService.getApplicants()) || [];
+                fillSection('applicants-container', 'applicants-empty',
+                            applicants, c => buildCandidateCard(c, 'applicant'));
+                document.getElementById('applicant-count').textContent = applicants.length;
+
+                // Saved candidates — optional API merged with in-page set
+                renderSavedCandidates();
+            });
+        }
+
+        function renderSavedCandidates() {
+            let saved = (DataService.getSavedCandidates && DataService.getSavedCandidates()) || [];
+            // Merge any saved-this-session ids that the API doesn't know about
+            savedCandidateIds.forEach(id => {
+                if (!saved.some(c => String(candidateId(c)) === String(id))) {
+                    const c = resolveCandidate(id);
+                    if (c) saved.push(c);
+                }
+            });
+            fillSection('saved-candidates-container', 'saved-empty',
+                        saved, c => buildCandidateCard(c, 'saved'));
+        }
+
+        // ── Actions ───────────────────────────────────────────────────
+        function handleSaveCandidate(id) {
+            const key = String(id);
+            if (savedCandidateIds.has(key)) savedCandidateIds.delete(key);
+            else savedCandidateIds.add(key);
+            if (DataService.toggleSaveCandidate) DataService.toggleSaveCandidate(id);
+            renderDashboard();
+        }
+        function handleUnsaveCandidate(id) {
+            savedCandidateIds.delete(String(id));
+            if (DataService.toggleSaveCandidate) DataService.toggleSaveCandidate(id);
+            renderDashboard();
+        }
+        function handleInvite(id) {
+            if (DataService.inviteCandidate) DataService.inviteCandidate(id);
+            const btn = document.querySelector(`#save-${id}`);
+            // Lightweight feedback
+            alert('Invitation to apply sent to the candidate.');
+        }
+        function handleSearch() {
+            const q = document.getElementById('search-input').value.trim();
+            window.location.href = `search_result.html?mode=candidates&role=employer${q ? '&q=' + encodeURIComponent(q) : ''}`;
+        }
+        document.getElementById('search-input').addEventListener('keydown', e => {
+            if (e.key === 'Enter') handleSearch();
+        });
+
+        // ── Boot ──────────────────────────────────────────────────────
+        document.addEventListener('DOMContentLoaded', renderDashboard);
+    </script>
+</body>
+</html>

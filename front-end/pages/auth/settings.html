@@ -6,6 +6,7 @@
     <title>Settings – ITMP</title>
     <link rel="stylesheet" href="../../assests/styling/global.css">
     <link rel="stylesheet" href="../../assests/styling/dashboard.css">
+    <link rel="icon" type="image/x-icon" href="../../assests/images/ITMP-icon-logo.ico">
     <style>
         /* ── Layout ──────────────────────────────────────────────── */
         .settings-main { padding: 2rem; align-items: flex-start; }
@@ -256,20 +257,22 @@
 
     <header>
         <a href="/" class="header-logo-link">
-            <div class="itmp-logo-placeholder"></div>
-            <span class="header-title">ITMP</span>
+            <div class="itmp-logo-placeholder">
+                <img src="../../assests/images/ITMP.png" style="max-width: 100px;">
+            </div>
+            <!--<span class="header-title">ITMP</span>-->
         </a>
         <div class="header-search" style="display:none;"></div>
         <div class="header-nav">
             <a href="c_dashboard.html">Dashboard</a>
-            <a href="profile.html">My Profile</a>
-            <a href="login.html">Sign Out</a>
+            <a href="c_edit_profile.html">My Profile</a>
+            <a href="#" onclick="DataService.logout();return false;">Sign Out</a>
         </div>
     </header>
 
     <main class="settings-main dashboard-main">
         <div style="width:100%;max-width:1000px;margin:0 auto;">
-            <a href="profile.html" class="back-link">← Back to Profile</a>
+            <a href="c_edit_profile.html" class="back-link">← Back to Profile</a>
         </div>
 
         <div class="settings-container">
@@ -720,7 +723,7 @@
     <!-- Toast -->
     <div class="toast" id="toast"></div>
 
-    <script src="../../../back-end/scripting/js-scripts/data.js"></script>
+    <script src="../../assests/js/data.js"></script>
     <script>
         // ── Avatar colours ────────────────────────────────────────────
         const AVATAR_COLORS = [
@@ -941,7 +944,7 @@
         function deleteAccount() {
             closeModal('delete-account-modal');
             showToast('Account deleted. Redirecting…', 'success');
-            setTimeout(() => window.location.href = 'login.html', 1800);
+            setTimeout(() => window.location.href = '/pages/login.html', 1800);
         }
 
         // ── Modal helpers ─────────────────────────────────────────────

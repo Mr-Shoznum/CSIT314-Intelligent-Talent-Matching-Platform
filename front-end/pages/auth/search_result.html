@@ -6,10 +6,18 @@
     <title>Search – ITMP</title>
     <link rel="stylesheet" href="../../assests/styling/global.css">
     <link rel="stylesheet" href="../../assests/styling/dashboard.css">
+    <link rel="icon" type="image/x-icon" href="../../assests/images/ITMP-icon-logo.ico">
     <style>
         /* ── Layout ──────────────────────────────────────────────── */
         .search-main { padding: 2rem; align-items: flex-start; }
         .search-wrapper { width: 100%; max-width: 1200px; margin: 0 auto; }
+
+        .back-link {
+            display: inline-flex; align-items: center; gap: 0.4rem;
+            color: var(--primary); font-weight: bold; font-size: 0.9rem;
+            text-decoration: none; margin-bottom: 1rem;
+        }
+        .back-link:hover { text-decoration: underline; }
 
         /* ── Search hero bar ─────────────────────────────────────── */
         .search-hero {
@@ -196,6 +204,11 @@
         }
         .cand-info { flex: 1; }
         .cand-name { font-size: 1.05rem; font-weight: bold; color: var(--text-main); }
+        .cand-name-link { color: var(--text-main); text-decoration: none; }
+        .cand-name-link:hover { color: var(--primary); text-decoration: underline; }
+        .cand-avatar-link { text-decoration: none; cursor: pointer; }
+        .cand-avatar-link:hover .cand-avatar { filter: brightness(0.92); }
+        .btn-text.cand-saved { color: var(--primary); }
         .cand-headline { font-size: 0.9rem; color: var(--text-muted); margin: 0.15rem 0; }
         .cand-meta { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 0.5rem; }
         .cand-skills { display: flex; flex-wrap: wrap; gap: 0.4rem; margin: 0.9rem 0; }
@@ -229,20 +242,26 @@
 <body>
 
     <header>
-        <a href="/" class="header-logo-link">
-            <div class="itmp-logo-placeholder"></div>
-            <span class="header-title">ITMP</span>
+        <a href="c_dashboard.html" class="header-logo-link" id="logo-link">
+            <div class="itmp-logo-placeholder">
+                <img src="../../assests/images/ITMP.png" style="max-width: 100px;">
+            </div>
+            <!--<span class="header-title">ITMP</span>-->
         </a>
         <div class="header-search" style="display:none;"></div>
         <div class="header-nav">
-            <a href="c_dashboard.html">Dashboard</a>
-            <a href="profile.html">My Profile</a>
-            <a href="login.html">Sign Out</a>
+            <a href="c_dashboard.html" id="nav-dashboard">Dashboard</a>
+            <a href="c_edit_profile.html" id="nav-profile">My Profile</a>
+            <a href="#" onclick="DataService.logout();return false;">Sign Out</a>
         </div>
     </header>
 
     <main class="search-main dashboard-main">
         <div class="search-wrapper">
+
+            <!-- Back link (role-aware) -->
+            <a href="c_dashboard.html" class="back-link" id="back-link">← Back to Dashboard</a>
+
 
             <!-- Search Hero -->
             <div class="search-hero">
@@ -405,10 +424,70 @@
         <div class="footer-copyright">&copy; 2026 ITMP. All rights reserved.</div>
     </footer>
 
-    <script src="../../../back-end/scripting/js-scripts/data.js"></script>
+    <script src="../../assests/js/data.js"></script>
     <script>
         // ── State ─────────────────────────────────────────────────────
         let _mode = 'jobs'; // 'jobs' | 'candidates'
+        let _role = 'candidate'; // 'candidate' | 'employer'
+        const savedCandidateIds = new Set();
+
+        // ── Role detection ────────────────────────────────────────────
+        // Priority: ?role= param → DataService → referrer → localStorage → default.
+        function detectRole() {
+            const params = new URLSearchParams(window.location.search);
+            const p = (params.get('role') || '').toLowerCase();
+            if (p === 'employer' || p === 'candidate') return p;
+
+            try {
+                if (window.DataService) {
+                    if (DataService.getCurrentRole) {
+                        const r = (DataService.getCurrentRole() || '').toLowerCase();
+                        if (r === 'employer' || r === 'candidate') return r;
+                    }
+                    if (DataService.getCurrentEmployer && DataService.getCurrentEmployer()) return 'employer';
+                }
+            } catch (e) { /* data.js may not expose these yet */ }
+
+            const ref = document.referrer || '';
+            if (/e_dashboard|e_edit_profile|create_job/i.test(ref)) return 'employer';
+            if (/c_dashboard|c_edit_profile|(^|\/)profile\.html/i.test(ref)) return 'candidate';
+
+            try {
+                const stored = localStorage.getItem('itmp_role');
+                if (stored === 'employer' || stored === 'candidate') return stored;
+            } catch (e) {}
+
+            return 'candidate';
+        }
+
+        const DASHBOARDS = { candidate: 'c_dashboard.html', employer: 'e_dashboard.html' };
+        const PROFILE_PAGES = { candidate: 'c_edit_profile.html', employer: 'e_edit_profile.html' };
+
+        // ── Apply role to chrome (logo, nav, back link) ───────────────
+        function applyRole(role) {
+            _role = role;
+            try { localStorage.setItem('itmp_role', role); } catch (e) {}
+            const dash    = DASHBOARDS[role];
+            const profile = PROFILE_PAGES[role];
+
+            document.getElementById('logo-link').href      = dash;
+            document.getElementById('nav-dashboard').href   = dash;
+            document.getElementById('back-link').href       = dash;
+
+            const navProfile = document.getElementById('nav-profile');
+            navProfile.href        = profile;
+            navProfile.textContent = role === 'employer' ? 'Company Profile' : 'My Profile';
+
+            // Employers default to finding candidates; candidates to finding jobs.
+            // Hide the toggle button that doesn't fit the role's primary task is NOT done —
+            // both remain available, but the sensible default is selected.
+        }
+
+        function candidateId(c) {
+            if (c.id != null) return c.id;
+            return (c.full_name || '').toLowerCase().trim()
+                .replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+        }
 
         // ── Mode switching ────────────────────────────────────────────
         function setMode(mode) {
@@ -516,7 +595,7 @@
                     <div class="rjc-top">
                         <div class="company-badge">${job.company_initials}</div>
                         <div class="rjc-title-group">
-                            <div class="rjc-title"><a href="job.html?id=${job.id}">${job.title}</a></div>
+                            <div class="rjc-title"><a href="view_job.html?id=${job.id}">${job.title}</a></div>
                             <div class="rjc-company">${job.company}</div>
                             <div class="rjc-meta">
                                 <span class="meta-tag">📍 ${job.location}</span>
@@ -531,7 +610,7 @@
                     <div class="rjc-actions">
                         ${actionBtn}
                         ${saveBtn}
-                        <a href="job.html?id=${job.id}" class="btn-text" style="margin-left:auto;">View details →</a>
+                        <a href="view_job.html?id=${job.id}" class="btn-text" style="margin-left:auto;">View details →</a>
                     </div>
                 </div>`;
             }).join('');
@@ -554,14 +633,19 @@
                 a === 'Immediate' ? 'avail-immediate' : a === '2 weeks' ? 'avail-twoweeks' : 'avail-month';
 
             list.innerHTML = candidates.map(c => {
+                const id = candidateId(c);
                 const topSkills = c.skills.slice(0, 6).map(s =>
                     `<span class="skill-tag">${s}</span>`).join('');
+                const isSaved = savedCandidateIds.has(String(id));
                 return `
                 <div class="card result-candidate-card">
                     <div class="rcc-top">
-                        <div class="cand-avatar" style="background:${c.avatar_color}">${c.avatar_initials}</div>
+                        <a href="view_profile.html?id=${id}" class="cand-avatar-link">
+                            <div class="cand-avatar" style="background:${c.avatar_color}">${c.avatar_initials}</div>
+                        </a>
                         <div class="cand-info">
-                            <div class="cand-name">${c.full_name}
+                            <div class="cand-name">
+                                <a href="view_profile.html?id=${id}" class="cand-name-link">${c.full_name}</a>
                                 ${c.open_to_work ? '<span style="font-size:0.78rem;color:var(--success);font-weight:bold;margin-left:0.5rem;"><span class="open-to-work-dot"></span>Open to work</span>' : ''}
                             </div>
                             <div class="cand-headline">${c.headline}</div>
@@ -575,9 +659,9 @@
                     </div>
                     <div class="cand-skills">${topSkills}</div>
                     <div class="cand-actions">
-                        <button class="btn-primary btn-sm">Invite to Apply</button>
-                        <button class="btn-secondary btn-sm">Save Candidate</button>
-                        <span style="margin-left:auto;font-size:0.8rem;color:var(--text-muted);">👁 ${c.profile_views} profile views</span>
+                        <button class="btn-primary btn-sm" onclick="doInvite('${id}')">Invite to Apply</button>
+                        <button class="btn-text ${isSaved ? 'cand-saved' : ''}" id="csave-${id}" onclick="doSaveCandidate('${id}')">${isSaved ? '★ Saved' : '☆ Save Candidate'}</button>
+                        <a href="view_profile.html?id=${id}" class="btn-text" style="margin-left:auto;">View profile →</a>
                     </div>
                 </div>`;
             }).join('');
@@ -586,6 +670,28 @@
         // ── Action handlers ───────────────────────────────────────────
         function doApply(jobId) { DataService.applyForJob(jobId); runSearch(); }
         function doSave(jobId)  { DataService.toggleSaveJob(jobId); runSearch(); }
+
+        function doSaveCandidate(id) {
+            const key = String(id);
+            if (savedCandidateIds.has(key)) savedCandidateIds.delete(key);
+            else savedCandidateIds.add(key);
+            if (window.DataService && DataService.toggleSaveCandidate) {
+                try { DataService.toggleSaveCandidate(id); } catch (e) {}
+            }
+            const btn = document.getElementById(`csave-${id}`);
+            if (btn) {
+                const on = savedCandidateIds.has(key);
+                btn.textContent = on ? '★ Saved' : '☆ Save Candidate';
+                btn.classList.toggle('cand-saved', on);
+            }
+        }
+        function doInvite(id) {
+            if (window.DataService && DataService.inviteCandidate) {
+                try { DataService.inviteCandidate(id); } catch (e) {}
+            }
+            const btn = document.getElementById(`csave-${id}`);
+            alert('Invitation to apply sent to the candidate.');
+        }
 
         function clearFilters() {
             document.querySelectorAll('.filter-card input[type=text]').forEach(i => i.value = '');
@@ -597,11 +703,26 @@
 
         // ── Boot ──────────────────────────────────────────────────────
         document.addEventListener('DOMContentLoaded', () => {
-            // Read ?q= and ?mode= from URL
             const params = new URLSearchParams(window.location.search);
-            if (params.get('q'))    document.getElementById('main-search').value = params.get('q');
-            if (params.get('mode') === 'candidates') setMode('candidates');
-            DataService.onReady(() => runSearch());
+
+            // 1. Determine role and wire up logo / nav / back link
+            applyRole(detectRole());
+
+            // 2. Prefill query
+            if (params.get('q')) document.getElementById('main-search').value = params.get('q');
+
+            // 3. Choose mode: explicit ?mode= wins, else default by role
+            //    (employers look for candidates; candidates look for jobs)
+            const modeParam = (params.get('mode') || '').toLowerCase();
+            const defaultMode = _role === 'employer' ? 'candidates' : 'jobs';
+            const initialMode = (modeParam === 'candidates' || modeParam === 'jobs')
+                ? modeParam : defaultMode;
+
+            DataService.onReady(() => {
+                // Re-check role once data.js is ready (it may now know the user)
+                applyRole(detectRole());
+                setMode(initialMode);
+            });
         });
     </script>
 </body>

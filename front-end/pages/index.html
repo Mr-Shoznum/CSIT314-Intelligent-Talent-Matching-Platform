@@ -1,247 +1,625 @@
 <!DOCTYPE html>
-<html>
-    <head>
-        <!--No JS yet, but figured id make a file anyways and reference it-->
-        <script src="home.js"></script>
-        <link rel="stylesheet" href="../assests/styling/home.css">
-        <link rel="stylesheet" href="../assests/styling/footer.css">
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-        <title>Intelligent Talent Matching Platform</title>
-        <link rel="icon" type="image/x-icon" href="../assests/images/ITMP-icon-logo.ico">
-    </head>
-    <body>
-        <div class="page-content">
-            <!--Top navigation-->
-            <header>
-                <img src="../assests/images/ITMP.png"></img>
-                <nav>
-                    <button onclick="handleAction('signup')">Sign up</button>
-                    <button onclick="handleAction('login')">Login</button>
-                </nav>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Intelligent Talent Matching Platform (ITMP)</title>
+    <link rel="stylesheet" href="../assests/styling/global.css">
+    <link rel="stylesheet" href="../assests/styling/dashboard.css">
+    <link rel="icon" type="image/x-icon" href="../assests/images/ITMP-icon-logo.ico">
+    <style>
+        /* ── Header CTA (uses dashboard.css header + header-nav) ─────── */
+        .nav-cta {
+            background-color: white;
+            color: var(--primary) !important;
+            padding: 0.5rem 1.1rem;
+            border-radius: var(--radius-btn);
+            transition: background 0.2s;
+        }
+        .nav-cta:hover { background-color: #e8f0ff; text-decoration: none !important; }
 
-                <div class="search-bar">
-                    <input type="text" placeholder="Search jobs...">
-                    <button onclick="openModal('search')">Search</button>
+        /* ── Layout (mirrors search_result.html) ────────────────────── */
+        .home-main { padding: 2rem; align-items: flex-start; }
+        .home-wrapper { width: 100%; max-width: 1200px; margin: 0 auto; }
+
+        /* ── Search hero (from search_result.html, with intro copy) ──── */
+        .search-hero {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-hover) 100%);
+            border-radius: var(--radius-card);
+            padding: 3rem 2.5rem;
+            margin-bottom: 1.5rem;
+            color: white;
+        }
+        .hero-eyebrow {
+            display: inline-block;
+            font-size: 0.78rem; font-weight: bold; letter-spacing: 1px; text-transform: uppercase;
+            color: white; background: rgba(255,255,255,0.18);
+            padding: 0.3rem 0.85rem; border-radius: 20px; margin-bottom: 1rem;
+        }
+        .search-hero h1 { font-size: 2.1rem; margin-bottom: 0.6rem; text-align: left; color: white; line-height: 1.2; }
+        .search-hero .hero-tagline {
+            color: rgba(255,255,255,0.88);
+            font-size: 1.05rem; max-width: 640px; margin-bottom: 1.75rem;
+        }
+        .mode-toggle {
+            display: inline-flex; background: rgba(255,255,255,0.15);
+            border-radius: 30px; padding: 4px; margin-bottom: 1.25rem; gap: 4px;
+        }
+        .mode-btn {
+            padding: 0.45rem 1.25rem; border-radius: 24px; border: none;
+            background: transparent; color: rgba(255,255,255,0.75);
+            font-weight: bold; font-size: 0.9rem; cursor: pointer; transition: all 0.2s;
+        }
+        .mode-btn.active { background: white; color: var(--primary); }
+        .search-input-row { display: flex; gap: 0.75rem; }
+        .search-input-row input {
+            flex: 1; padding: 0.75rem 1.25rem; border-radius: var(--radius-btn);
+            border: none; font-size: 1rem; outline: none;
+        }
+        .btn-search-main {
+            background: white; color: var(--primary); border: none;
+            padding: 0.75rem 1.75rem; border-radius: var(--radius-btn);
+            font-weight: bold; font-size: 0.95rem; cursor: pointer;
+            transition: opacity 0.2s; white-space: nowrap;
+        }
+        .btn-search-main:hover { opacity: 0.9; }
+        .hero-stats {
+            display: flex; gap: 2.5rem; flex-wrap: wrap;
+            margin-top: 1.75rem; padding-top: 1.5rem;
+            border-top: 1px solid rgba(255,255,255,0.2);
+        }
+        .hero-stat strong { display: block; font-size: 1.6rem; color: white; }
+        .hero-stat span { font-size: 0.85rem; color: rgba(255,255,255,0.8); }
+
+        /* ── Results area (live preview) ────────────────────────────── */
+        .results-area { display: flex; flex-direction: column; gap: 1rem; }
+        .results-header {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 0 0.25rem; margin-top: 0.5rem;
+        }
+        .results-header h2 { font-size: 1.25rem; color: var(--text-main); }
+        .results-header .view-all { color: var(--primary-light); font-weight: bold; font-size: 0.9rem; }
+
+        /* ── Job result card (from search_result.html) ──────────────── */
+        .result-job-card { padding: 1.5rem; }
+        .rjc-top { display: flex; gap: 1rem; align-items: flex-start; margin-bottom: 1rem; }
+        .company-badge {
+            width: 48px; height: 48px; border-radius: 10px;
+            background: var(--primary); color: white; font-weight: bold; font-size: 1rem;
+            display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+        }
+        .rjc-title-group { flex: 1; }
+        .rjc-title { font-size: 1.1rem; font-weight: bold; color: var(--primary); margin-bottom: 0.15rem; }
+        .rjc-title a { color: inherit; text-decoration: none; }
+        .rjc-title a:hover { text-decoration: underline; }
+        .rjc-company { font-size: 0.9rem; font-weight: bold; color: var(--text-muted); }
+        .rjc-meta { display: flex; flex-wrap: wrap; gap: 0.5rem; margin: 0.6rem 0; }
+        .meta-tag {
+            font-size: 0.8rem; background: var(--bg-light-hover);
+            padding: 0.25rem 0.65rem; border-radius: 20px; color: var(--text-muted); font-weight: bold;
+        }
+        .rjc-skills { display: flex; flex-wrap: wrap; gap: 0.4rem; margin: 0.75rem 0; }
+        .rjc-actions {
+            display: flex; gap: 0.75rem; align-items: center;
+            padding-top: 1rem; border-top: 1px solid var(--border-light);
+        }
+
+        /* ── Candidate result card (from search_result.html) ────────── */
+        .result-candidate-card { padding: 1.5rem; }
+        .rcc-top { display: flex; gap: 1rem; align-items: flex-start; }
+        .cand-avatar {
+            width: 56px; height: 56px; border-radius: 50%;
+            color: white; font-weight: bold; font-size: 1.1rem;
+            display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+        }
+        .cand-info { flex: 1; }
+        .cand-name { font-size: 1.05rem; font-weight: bold; color: var(--text-main); }
+        .cand-headline { font-size: 0.9rem; color: var(--text-muted); margin: 0.15rem 0; }
+        .cand-meta { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 0.5rem; }
+        .cand-skills { display: flex; flex-wrap: wrap; gap: 0.4rem; margin: 0.9rem 0; }
+        .cand-actions {
+            display: flex; gap: 0.75rem; align-items: center;
+            padding-top: 1rem; border-top: 1px solid var(--border-light);
+        }
+        .avail-badge { padding: 0.25rem 0.7rem; border-radius: 20px; font-size: 0.78rem; font-weight: bold; }
+        .avail-immediate { background: #e6ffe6; color: var(--success); border: 1px solid var(--success); }
+        .avail-twoweeks  { background: #fff8e6; color: #b08000; border: 1px solid #f0c040; }
+        .open-to-work-dot {
+            display: inline-block; width: 8px; height: 8px;
+            background: var(--success); border-radius: 50%; margin-right: 4px;
+        }
+        .profile-views { margin-left: auto; font-size: 0.8rem; color: var(--text-muted); }
+
+        /* ── Generic landing section heading ────────────────────────── */
+        .section-block { margin-top: 3.5rem; }
+        .block-head { text-align: center; max-width: 640px; margin: 0 auto 2rem; }
+        .block-eyebrow {
+            display: inline-block; font-size: 0.78rem; font-weight: bold;
+            letter-spacing: 1px; text-transform: uppercase; color: var(--primary);
+            background: var(--bg-light-hover); padding: 0.3rem 0.85rem;
+            border-radius: 20px; margin-bottom: 0.85rem;
+        }
+        .block-head h2 { font-size: 1.75rem; color: var(--text-main); margin-bottom: 0.5rem; }
+        .block-head p { color: var(--text-muted); font-size: 1rem; }
+
+        /* ── Value-prop feature cards ───────────────────────────────── */
+        .feature-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1.25rem; }
+        .feature-card { padding: 2rem 1.75rem; }
+        .feature-icon {
+            width: 52px; height: 52px; border-radius: 12px;
+            background: var(--bg-light-hover); color: var(--primary);
+            display: flex; align-items: center; justify-content: center; margin-bottom: 1.25rem;
+        }
+        .feature-card h3 { font-size: 1.15rem; color: var(--text-main); margin-bottom: 0.5rem; }
+        .feature-card p { color: var(--text-muted); font-size: 0.95rem; }
+
+        /* ── How-it-works steps ─────────────────────────────────────── */
+        .steps-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1.25rem; }
+        .step-card { padding: 2rem 1.75rem; }
+        .step-num {
+            width: 40px; height: 40px; border-radius: 50%;
+            background: var(--primary); color: white; font-weight: bold; font-size: 1.1rem;
+            display: flex; align-items: center; justify-content: center; margin-bottom: 1rem;
+        }
+        .step-card h3 { font-size: 1.1rem; margin-bottom: 0.5rem; color: var(--text-main); }
+        .step-card p { color: var(--text-muted); font-size: 0.95rem; }
+
+        /* ── Audience split ─────────────────────────────────────────── */
+        .audience-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem; }
+        .audience-card { padding: 2rem; display: flex; flex-direction: column; }
+        .audience-card h3 {
+            font-size: 1.3rem; color: var(--primary);
+            margin-bottom: 1.25rem; display: flex; align-items: center; gap: 0.6rem;
+        }
+        .audience-list { list-style: none; margin-bottom: 1.75rem; display: flex; flex-direction: column; gap: 0.65rem; }
+        .audience-list li { position: relative; padding-left: 1.75rem; color: var(--text-main); font-size: 0.95rem; }
+        .audience-list li::before { content: "✓"; position: absolute; left: 0; color: var(--success); font-weight: bold; }
+        .audience-card .btn-primary {
+            margin-top: auto; display: block; width: 100%;
+            text-align: center; text-decoration: none;
+        }
+
+        /* ── Membership CTA (matches dashboard welcome-banner vibe) ──── */
+        .membership-cta {
+            margin-top: 3.5rem;
+            border-radius: var(--radius-card);
+            background: linear-gradient(135deg, #ffffff 0%, var(--bg-light-hover) 100%);
+            border-left: 5px solid var(--primary);
+            box-shadow: var(--shadow-card);
+            padding: 2rem 2.5rem;
+            display: flex; align-items: center; justify-content: space-between;
+            gap: 1.5rem; flex-wrap: wrap;
+        }
+        .membership-cta h2 { font-size: 1.4rem; color: var(--text-main); margin-bottom: 0.35rem; }
+        .membership-cta p { color: var(--text-muted); }
+        .membership-cta .cta-btn {
+            background: var(--primary-light); color: white; font-weight: bold;
+            padding: 0.85rem 1.75rem; border-radius: var(--radius-btn);
+            white-space: nowrap; transition: background 0.3s;
+        }
+        .membership-cta .cta-btn:hover { background: var(--primary-hover); }
+
+        /* ── Sign-up / login modal ──────────────────────────────────── */
+        .modal-overlay {
+            position: fixed; inset: 0; background: rgba(8, 13, 20, 0.6);
+            display: flex; align-items: center; justify-content: center;
+            padding: 1rem; z-index: 1000; animation: fadeIn 0.2s ease-out;
+        }
+        .modal-overlay.hidden { display: none; }
+        .modal-content {
+            background: white; border-radius: var(--radius-card); box-shadow: var(--shadow-card);
+            max-width: 420px; width: 100%; padding: 2.5rem; text-align: center;
+        }
+        .modal-content h2 { color: var(--text-main); margin-bottom: 0.75rem; }
+        .modal-content p { color: var(--text-muted); margin-bottom: 1.5rem; }
+        .modal-buttons { display: flex; gap: 0.75rem; margin-bottom: 1rem; }
+        .modal-btn {
+            flex: 1; padding: 0.85rem; font-weight: bold; border-radius: var(--radius-btn);
+            cursor: pointer; font-size: 1rem; text-decoration: none;
+        }
+        .signup-btn { background: var(--primary-light); color: white; border: none; }
+        .signup-btn:hover { background: var(--primary-hover); }
+        .login-btn { background: white; color: var(--primary); border: 2px solid var(--primary); }
+        .login-btn:hover { background: var(--bg-light-hover); }
+        .modal-close {
+            background: none; border: none; color: var(--text-muted);
+            font-weight: bold; cursor: pointer; font-size: 0.9rem;
+        }
+        .modal-close:hover { color: var(--primary); text-decoration: underline; }
+
+        @media (max-width: 600px) {
+            .search-hero h1 { font-size: 1.6rem; }
+            .search-input-row { flex-direction: column; }
+            .hero-stats { gap: 1.5rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <a href="index.html" class="header-logo-link">
+            <div class="itmp-logo-placeholder">
+                <img src="../assests/images/ITMP.png" style="max-width: 100px;">
+            </div>
+            <!--<span class="header-title">ITMP</span>-->
+        </a>
+        <div class="header-nav">
+            <a href="membership.html">Membership</a>
+            <a href="login.html">Login</a>
+            <a href="register.html" class="nav-cta">Sign Up</a>
+        </div>
+    </header>
+
+    <main class="home-main dashboard-main">
+        <div class="home-wrapper">
+
+            <!-- ── Hero: intro + live search ─────────────────────────── -->
+            <div class="search-hero">
+                <span class="hero-eyebrow">Intelligent Talent Matching</span>
+                <h1>Where talent meets the right opportunity</h1>
+                <p class="hero-tagline">
+                    ITMP matches candidates and employers on skills, experience and preferences —
+                    not just keywords. Build a profile, see your match scores, and connect in one click.
+                </p>
+                <div class="mode-toggle">
+                    <button class="mode-btn active" id="btn-mode-jobs" onclick="setMode('jobs')">🔍 Find Jobs</button>
+                    <button class="mode-btn" id="btn-mode-candidates" onclick="setMode('candidates')">👥 Find Candidates</button>
                 </div>
-
-                <!--All the filter options-->
-                <div class="filter-bar">
-                    <!--Labels to help link to each search option-->
-                    <label for="location">Location:</label>
-                    <select id="location">
-                        <option value="wollongong">Wollongong</option>
-                        <option value="sydney">Sydney</option>
-                        <option value="canberra">Canberra</option>
-                        <option value="melbourne">Melbourne</option>
-                        <option value="brisbane">Brisbane</option>
-                        <option value="perth">Perth</option>
-                    </select>
-
-                    <label for="contract">Contract:</label>
-                    <select id="contract">
-                        <option value="full-time">Full-time</option>
-                        <option value="part-time">Part-time</option>
-                    </select>
-
-                    <label for="work-from">Work from:</label>
-                    <select id="work-from">
-                        <option value="in-person">In-person</option>
-                        <option value="remote">Remote</option>
-                        <option value="hybrid">Hybrid</option>
-                    </select>
-
-                    <label for="pay">Pay:</label>
-                    <select id="pay">
-                        <option value="any">Any</option>
-                        <option value="60kplus">$60,000+</option>
-                        <option value="70kplus">$70,000+</option>
-                        <option value="90kplus">$90,000+</option>
-                        <option value="110kplus">$110,000+</option>
-                        <option value="130kplus">$130,000+</option>
-                        <option value="210kplus">$210,000+</option>
-                    </select>
-
-                    <label for="time-of-listing">Time of listing:</label>
-                    <select id="time-of-listing">
-                        <option value="last-24-hours">Last 24 hours</option>
-                        <option value="last-7-days">Last 7 days</option>
-                        <option value="last-30-days">Last 30 days</option>
-                        <option value="last-year">Last year</option>
-                    </select>
+                <div class="search-input-row">
+                    <input type="text" id="main-search" placeholder="Search by title, skill, company or location…"
+                           onkeydown="if(event.key==='Enter') openModal()">
+                    <button class="btn-search-main" onclick="openModal()">Search</button>
                 </div>
-            </header>
-
-        <!--Website name to be displayed on main page-->
-            <div class="website-name">
-                <h1>Intelligent Talent Matching Platform</h1>
-            </div>  
-            
-            <div class="listing-title">
-                <h2>Find your next career opportunity</h2>
-                <p>Discover the best job matches based on your preferences and qualifications.</p>
+                <div class="hero-stats">
+                    <div class="hero-stat"><strong>10,000+</strong><span>Active job listings</span></div>
+                    <div class="hero-stat"><strong>5,000+</strong><span>Employers hiring</span></div>
+                    <div class="hero-stat"><strong>92%</strong><span>Average match accuracy</span></div>
+                </div>
             </div>
 
-        <!--Job listings displayed on main page-->
-            <div class="listings">
-                <div class="listing-card">
-                    <h3>Software Engineer</h3>
-                    <p>Location: Sydney</p>
-                    <p>Contract: Full-time</p>
-                    <p>Work from: Remote</p>
-                    <p>Pay: $90,000+</p>
-                    <button onclick="openModal('job')">View Details</button>
+            <!-- ── Live preview: jobs ─────────────────────────────────── -->
+            <div id="jobs-view" class="results-area">
+                <div class="results-header">
+                    <h2>Featured job matches</h2>
+                    <a href="register.html" class="view-all">See all jobs →</a>
                 </div>
 
-                <div class="listing-card">
-                    <h3>Data Analyst</h3>
-                    <p>Location: Melbourne</p>
-                    <p>Contract: Part-time</p>
-                    <p>Work from: In-person</p>
-                    <p>Pay: $70,000+</p>
-                    <button onclick="openModal('job')">View Details</button>
-                </div>
-
-                <div class="listing-card">
-                    <h3>Project Manager</h3>
-                    <p>Location: Brisbane</p>
-                    <p>Contract: Full-time</p>
-                    <p>Work from: Hybrid</p>
-                    <p>Pay: $110,000+</p>
-                    <button onclick="openModal('job')">View Details</button>
-                </div>
-
-                <!--More jobs can be added here if we want-->
-            </div>
-
-
-            <div class="listing-title">
-                <h2>Reach out to possible employees</h2>
-                <p>Discover the best person for the job matching based on job postings and tags.</p>
-            </div>
-
-        <!--Employees listings displayed on main page-->
-            <div class="listings">
-                <div class="listing-card">
-                    <h3>Software Engineer</h3>
-                    <p>Location: Sydney</p>
-                    <p>Status: unemployed</p>
-                    <p>Skills: ...</p>
-                    <p>Previous Employment: ...+</p>
-                    <button onclick="openModal('job')">Reach Out</button>
-                </div>
-
-                <div class="listing-card">
-                    <h3>Cyber Security Analyst</h3>
-                    <p>Location: Wollongong</p>
-                    <p>Status: Casual</p>
-                    <p>Skills: ...</p>
-                    <p>Previous Employment: ...</p>
-                    <button onclick="openModal('job')">Reach Out</button>
-                </div>
-
-                <div class="listing-card">
-                    <h3>AI Engineer</h3>
-                    <p>Location: Brisbane</p>
-                    <p>Status: Part-time</p>
-                    <p>Skills: ...</p>
-                    <p>Previous Employment: ...</p>
-                    <button onclick="openModal('job')">Reach Out</button>
-                </div>
-                <!--More jobs can be added here if we want-->
-            </div>
-
-            <div class="listing-title">
-                <br> 
-                <!-- Blank spacing -->
-            </div>
-
-            <footer>
-                <div class="footer-container">
-                    
-                    <div class="footer-content">
-                        
-                        <!-- Left: Brand -->
-                        <div class="footer-brand">
-                            <div class="footer-logo"></div>
-                            <div>
-                                <h2>ITMP</h2>
-                                <p>Intelligent Talent Matching Platform</p>
+                <div class="card result-job-card">
+                    <div class="rjc-top">
+                        <div class="company-badge">TS</div>
+                        <div class="rjc-title-group">
+                            <div class="rjc-title"><a href="#" onclick="openModal();return false;">Software Engineer</a></div>
+                            <div class="rjc-company">TechSolutions</div>
+                            <div class="rjc-meta">
+                                <span class="meta-tag">📍 Sydney</span>
+                                <span class="meta-tag">🖥️ Remote</span>
+                                <span class="meta-tag">💰 $90,000+</span>
+                                <span class="meta-tag">💼 Full-time</span>
                             </div>
                         </div>
-
-                        <!-- Center: Legal Links -->
-                        <div class="footer-links">
-                            <a href="#" class="footer-link">Terms of Service</a>
-                            <a href="#" class="footer-link">Privacy Policy</a>
-                            <a href="#" class="footer-link">Cookie Policy</a>
-                            <a href="#" class="footer-link">Candidate Terms</a>
-                            <a href="#" class="footer-link">Employer Terms</a>
-                            <a href="#" class="footer-link">Licenses</a>
-                        </div>
-
-                        <!-- Right: Social Icons -->
-                        <div class="footer-social">
-                            <a href="#" aria-label="YouTube">
-                                <i class="fa-brands fa-youtube"></i>
-                            </a>
-                            <a href="#" aria-label="Facebook">
-                                <i class="fa-brands fa-facebook"></i>
-                            </a>
-                            <a href="#" aria-label="Instagram">
-                                <i class="fa-brands fa-instagram"></i>
-                            </a>
-                            <a href="#" aria-label="LinkedIn">
-                                <i class="fa-brands fa-linkedin"></i>
-                            </a>
-                            <a href="#" aria-label="X (Twitter)">
-                                <i class="fa-brands fa-x-twitter"></i>
-                            </a>
-                        </div>
+                        <div class="match-score">94% Match</div>
                     </div>
-
-                    <!-- Bottom Bar -->
-                    <div class="footer-bottom">
-                        <div>
-                            © 2026 Intelligent Talent Matching Platform (ITMP). All rights reserved.
-                        </div>
-                        <div class="footer-bottom-right">
-                            <a href="#">Accessibility</a>
-                            <a href="#">Sitemap</a>
-                            <a href="#">Contact Support</a>
-                        </div>
+                    <div class="rjc-skills">
+                        <span class="skill-tag">JavaScript</span>
+                        <span class="skill-tag">React</span>
+                        <span class="skill-tag">Node.js</span>
+                        <span class="skill-tag">SQL</span>
                     </div>
-
+                    <div class="rjc-actions">
+                        <button class="btn-primary btn-sm" onclick="openModal()">One-Click Apply</button>
+                        <button class="btn-text" onclick="openModal()">☆ Save</button>
+                        <a href="#" class="btn-text" style="margin-left:auto;" onclick="openModal();return false;">View details →</a>
+                    </div>
                 </div>
-            </footer>
-        </div>
 
-        <!-- Modal Overlay -->
-        <div id="modal-overlay" class="modal-overlay hidden">
-            <script src="../../back-end/scripting/js-scripts/modal-script.js"></script>
-
-            <link rel="stylesheet" href="../assests/styling/modal-style.css">
-
-            <div class="modal-container">
-                <div class="modal-content">
-                    <h2 class="modal-title">Sign up or log in</h2>
-                    <p id="modal-message" class="modal-message">
-                        Please sign up or log in to view the job position
-                    </p>
-                    
-                    <div class="modal-buttons">
-                        <button class="modal-btn signup-btn" onclick="handleAction('signup')">Sign Up</button>
-                        <button class="modal-btn login-btn" onclick="handleAction('login')">Log In</button>
+                <div class="card result-job-card">
+                    <div class="rjc-top">
+                        <div class="company-badge">DC</div>
+                        <div class="rjc-title-group">
+                            <div class="rjc-title"><a href="#" onclick="openModal();return false;">Data Analyst</a></div>
+                            <div class="rjc-company">DataCorp</div>
+                            <div class="rjc-meta">
+                                <span class="meta-tag">📍 Melbourne</span>
+                                <span class="meta-tag">🖥️ On-site</span>
+                                <span class="meta-tag">💰 $70,000+</span>
+                                <span class="meta-tag">💼 Part-time</span>
+                            </div>
+                        </div>
+                        <div class="match-score">88% Match</div>
                     </div>
-                    
-                    <button class="modal-close" onclick="closeModal()">Not now</button>
+                    <div class="rjc-skills">
+                        <span class="skill-tag">SQL</span>
+                        <span class="skill-tag">Python</span>
+                        <span class="skill-tag">Power BI</span>
+                    </div>
+                    <div class="rjc-actions">
+                        <button class="btn-primary btn-sm" onclick="openModal()">One-Click Apply</button>
+                        <button class="btn-text" onclick="openModal()">☆ Save</button>
+                        <a href="#" class="btn-text" style="margin-left:auto;" onclick="openModal();return false;">View details →</a>
+                    </div>
+                </div>
+
+                <div class="card result-job-card">
+                    <div class="rjc-top">
+                        <div class="company-badge">BL</div>
+                        <div class="rjc-title-group">
+                            <div class="rjc-title"><a href="#" onclick="openModal();return false;">Project Manager</a></div>
+                            <div class="rjc-company">BuildLogic</div>
+                            <div class="rjc-meta">
+                                <span class="meta-tag">📍 Brisbane</span>
+                                <span class="meta-tag">🖥️ Hybrid</span>
+                                <span class="meta-tag">💰 $110,000+</span>
+                                <span class="meta-tag">💼 Full-time</span>
+                            </div>
+                        </div>
+                        <div class="match-score">81% Match</div>
+                    </div>
+                    <div class="rjc-skills">
+                        <span class="skill-tag">Agile</span>
+                        <span class="skill-tag">Scrum</span>
+                        <span class="skill-tag">Stakeholder Mgmt</span>
+                    </div>
+                    <div class="rjc-actions">
+                        <button class="btn-primary btn-sm" onclick="openModal()">One-Click Apply</button>
+                        <button class="btn-text" onclick="openModal()">☆ Save</button>
+                        <a href="#" class="btn-text" style="margin-left:auto;" onclick="openModal();return false;">View details →</a>
+                    </div>
                 </div>
             </div>
+
+            <!-- ── Live preview: candidates ───────────────────────────── -->
+            <div id="candidates-view" class="results-area" style="display:none;">
+                <div class="results-header">
+                    <h2>Featured candidates</h2>
+                    <a href="register.html" class="view-all">See all candidates →</a>
+                </div>
+
+                <div class="card result-candidate-card">
+                    <div class="rcc-top">
+                        <div class="cand-avatar" style="background:var(--primary);">AB</div>
+                        <div class="cand-info">
+                            <div class="cand-name">Alex Brown
+                                <span style="font-size:0.78rem;color:var(--success);font-weight:bold;margin-left:0.5rem;"><span class="open-to-work-dot"></span>Open to work</span>
+                            </div>
+                            <div class="cand-headline">Software Engineer</div>
+                            <div class="cand-meta">
+                                <span class="meta-tag">📍 Sydney</span>
+                                <span class="meta-tag">🖥️ Remote</span>
+                                <span class="meta-tag">💼 5 yrs exp</span>
+                                <span class="avail-badge avail-immediate">⏱ Immediate</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="cand-skills">
+                        <span class="skill-tag">Java</span>
+                        <span class="skill-tag">Spring</span>
+                        <span class="skill-tag">AWS</span>
+                        <span class="skill-tag">Docker</span>
+                    </div>
+                    <div class="cand-actions">
+                        <button class="btn-primary btn-sm" onclick="openModal()">Invite to Apply</button>
+                        <button class="btn-secondary btn-sm" onclick="openModal()">Save Candidate</button>
+                        <span class="profile-views">👁 248 profile views</span>
+                    </div>
+                </div>
+
+                <div class="card result-candidate-card">
+                    <div class="rcc-top">
+                        <div class="cand-avatar" style="background:#0056b3;">PK</div>
+                        <div class="cand-info">
+                            <div class="cand-name">Priya Kapoor</div>
+                            <div class="cand-headline">Cyber Security Analyst</div>
+                            <div class="cand-meta">
+                                <span class="meta-tag">📍 Wollongong</span>
+                                <span class="meta-tag">🖥️ Hybrid</span>
+                                <span class="meta-tag">💼 3 yrs exp</span>
+                                <span class="avail-badge avail-twoweeks">⏱ 2 weeks</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="cand-skills">
+                        <span class="skill-tag">SIEM</span>
+                        <span class="skill-tag">Pen Testing</span>
+                        <span class="skill-tag">Networking</span>
+                    </div>
+                    <div class="cand-actions">
+                        <button class="btn-primary btn-sm" onclick="openModal()">Invite to Apply</button>
+                        <button class="btn-secondary btn-sm" onclick="openModal()">Save Candidate</button>
+                        <span class="profile-views">👁 132 profile views</span>
+                    </div>
+                </div>
+
+                <div class="card result-candidate-card">
+                    <div class="rcc-top">
+                        <div class="cand-avatar" style="background:#004085;">MN</div>
+                        <div class="cand-info">
+                            <div class="cand-name">Marcus Ng
+                                <span style="font-size:0.78rem;color:var(--success);font-weight:bold;margin-left:0.5rem;"><span class="open-to-work-dot"></span>Open to work</span>
+                            </div>
+                            <div class="cand-headline">AI Engineer</div>
+                            <div class="cand-meta">
+                                <span class="meta-tag">📍 Brisbane</span>
+                                <span class="meta-tag">🖥️ Remote</span>
+                                <span class="meta-tag">💼 4 yrs exp</span>
+                                <span class="avail-badge avail-immediate">⏱ Immediate</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="cand-skills">
+                        <span class="skill-tag">Python</span>
+                        <span class="skill-tag">PyTorch</span>
+                        <span class="skill-tag">LLMs</span>
+                        <span class="skill-tag">MLOps</span>
+                    </div>
+                    <div class="cand-actions">
+                        <button class="btn-primary btn-sm" onclick="openModal()">Invite to Apply</button>
+                        <button class="btn-secondary btn-sm" onclick="openModal()">Save Candidate</button>
+                        <span class="profile-views">👁 301 profile views</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ── Why ITMP: value props ──────────────────────────────── -->
+            <section class="section-block">
+                <div class="block-head">
+                    <span class="block-eyebrow">Why ITMP</span>
+                    <h2>Smarter matching, less searching</h2>
+                    <p>We do the hard work of surfacing the right roles and the right people, so you spend time on decisions — not endless scrolling.</p>
+                </div>
+                <div class="feature-grid">
+                    <div class="card feature-card">
+                        <div class="feature-icon">
+                            <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <circle cx="12" cy="12" r="10"></circle><circle cx="12" cy="12" r="6"></circle><circle cx="12" cy="12" r="2"></circle>
+                            </svg>
+                        </div>
+                        <h3>Skill-based matching</h3>
+                        <p>Every role is scored against your skills, experience and preferences — so the strongest matches rise to the top automatically.</p>
+                    </div>
+                    <div class="card feature-card">
+                        <div class="feature-icon">
+                            <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+                            </svg>
+                        </div>
+                        <h3>One-click apply</h3>
+                        <p>Upload your résumé once and your profile fills itself. Apply to any role instantly without re-entering your details.</p>
+                    </div>
+                    <div class="card feature-card">
+                        <div class="feature-icon">
+                            <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path><polyline points="9 12 11 14 15 10"></polyline>
+                            </svg>
+                        </div>
+                        <h3>Verified employers</h3>
+                        <p>Connect with vetted companies that are actively hiring, with transparent salary ranges and work-mode details up front.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ── How it works ───────────────────────────────────────── -->
+            <section class="section-block">
+                <div class="block-head">
+                    <span class="block-eyebrow">How it works</span>
+                    <h2>Get matched in three steps</h2>
+                    <p>From sign-up to your first conversation, ITMP keeps the process fast and focused.</p>
+                </div>
+                <div class="steps-grid">
+                    <div class="card step-card">
+                        <div class="step-num">1</div>
+                        <h3>Create your profile</h3>
+                        <p>Sign up as a candidate or employer and upload a résumé to auto-fill your details in seconds.</p>
+                    </div>
+                    <div class="card step-card">
+                        <div class="step-num">2</div>
+                        <h3>See your matches</h3>
+                        <p>Browse roles or candidates ranked by match score, with skills you share highlighted.</p>
+                    </div>
+                    <div class="card step-card">
+                        <div class="step-num">3</div>
+                        <h3>Apply &amp; connect</h3>
+                        <p>One-click apply to jobs, or invite top candidates to apply — and pick up the conversation from your dashboard.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ── Audience split ─────────────────────────────────────── -->
+            <section class="section-block">
+                <div class="block-head">
+                    <span class="block-eyebrow">Built for both sides</span>
+                    <h2>Whether you're hiring or job hunting</h2>
+                </div>
+                <div class="audience-grid">
+                    <div class="card audience-card">
+                        <h3>
+                            <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle>
+                            </svg>
+                            For job seekers
+                        </h3>
+                        <ul class="audience-list">
+                            <li>Build a profile in minutes by uploading your résumé</li>
+                            <li>See a match score on every role before you apply</li>
+                            <li>Apply with one click — no repetitive forms</li>
+                            <li>Get discovered by employers searching for your skills</li>
+                        </ul>
+                        <a href="register.html" class="btn-primary">Sign up as a candidate</a>
+                    </div>
+                    <div class="card audience-card">
+                        <h3>
+                            <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <rect x="4" y="2" width="16" height="20" rx="2" ry="2"></rect><path d="M9 22v-4h6v4"></path>
+                                <path d="M8 6h.01"></path><path d="M16 6h.01"></path><path d="M12 6h.01"></path><path d="M12 10h.01"></path><path d="M12 14h.01"></path>
+                            </svg>
+                            For employers
+                        </h3>
+                        <ul class="audience-list">
+                            <li>Post roles and instantly reach matched candidates</li>
+                            <li>Search a pool of verified, ready-to-work talent</li>
+                            <li>Filter by skills, experience and availability</li>
+                            <li>Invite standout candidates to apply directly</li>
+                        </ul>
+                        <a href="register.html" class="btn-primary">Hire talent</a>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ── Membership CTA ───────────────────────────────────── -->
+            <div class="membership-cta">
+                <div>
+                    <h2>Unlock more with ITMP Plus</h2>
+                    <p>Unlimited searches, unlimited matching, and exclusive member benefits.</p>
+                </div>
+                <a href="membership.html" class="cta-btn">View Membership Plans</a>
+            </div>
+
         </div>
-    
+    </main>
 
-       
+    <footer class="minimal-footer">
+        <div class="footer-links">
+            <a href="#">Terms of Service</a>
+            <a href="#">Privacy Policy</a>
+            <a href="#">Cookie Policy</a>
+            <a href="#">Candidate Terms</a>
+            <a href="#">Employer Terms</a>
+            <a href="#">Licenses</a>
+        </div>
+        <div class="footer-copyright">
+            &copy; 2026 Intelligent Talent Matching Platform (ITMP). All rights reserved.
+        </div>
+    </footer>
 
+    <!-- ── Modal ─────────────────────────────────────────────────── -->
+    <div id="modal-overlay" class="modal-overlay hidden">
+        <div class="modal-content">
+            <h2>Sign up or log in</h2>
+            <p>Please sign up or log in to view the full listing and matches.</p>
+            <div class="modal-buttons">
+                <a href="register.html" class="modal-btn signup-btn">Sign Up</a>
+                <a href="login.html" class="modal-btn login-btn">Log In</a>
+            </div>
+            <button class="modal-close" onclick="closeModal()">Not now</button>
+        </div>
+    </div>
 
-        
-    </body>
+    <script>
+        // ── Mode toggle: switch showcased set ──────────────────────────
+        function setMode(mode) {
+            const isJobs = mode === 'jobs';
+            document.getElementById('jobs-view').style.display       = isJobs ? 'flex' : 'none';
+            document.getElementById('candidates-view').style.display = isJobs ? 'none' : 'flex';
+            document.getElementById('btn-mode-jobs').classList.toggle('active', isJobs);
+            document.getElementById('btn-mode-candidates').classList.toggle('active', !isJobs);
+        }
+
+        // ── Sign-up funnel modal ───────────────────────────────────────
+        function openModal()  { document.getElementById('modal-overlay').classList.remove('hidden'); }
+        function closeModal() { document.getElementById('modal-overlay').classList.add('hidden'); }
+        document.getElementById('modal-overlay').addEventListener('click', (e) => {
+            if (e.target.id === 'modal-overlay') closeModal();
+        });
+    </script>
+
+</body>
 </html>
