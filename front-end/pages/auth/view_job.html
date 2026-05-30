@@ -1,0 +1,559 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Job Details – ITMP</title>
+    <link rel="stylesheet" href="../../assests/styling/global.css">
+    <link rel="stylesheet" href="../../assests/styling/dashboard.css">
+    <link rel="icon" type="image/x-icon" href="../../assests/images/ITMP-icon-logo.ico">
+    <style>
+        /* ── Job detail page specific styles ──────────────────────── */
+        .job-detail-main {
+            padding: 2rem;
+            align-items: flex-start;
+        }
+        .job-detail-container {
+            width: 100%;
+            max-width: 1100px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 1fr 340px;
+            gap: 2rem;
+            align-items: start;
+        }
+
+        /* Back link */
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            color: var(--primary);
+            font-weight: bold;
+            font-size: 0.9rem;
+            text-decoration: none;
+            margin-bottom: 1rem;
+            display: block;
+        }
+        .back-link:hover { text-decoration: underline; }
+
+        /* Left col */
+        .job-left-col { display: flex; flex-direction: column; gap: 1.5rem; }
+
+        /* Hero */
+        .job-hero-card { padding: 2rem; }
+        .job-hero-top {
+            display: flex;
+            gap: 1.25rem;
+            align-items: flex-start;
+            margin-bottom: 1.5rem;
+        }
+        .company-logo-large {
+            width: 68px;
+            height: 68px;
+            border-radius: 14px;
+            background-color: var(--primary);
+            color: white;
+            font-weight: bold;
+            font-size: 1.4rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+        .job-hero-title-group { flex: 1; }
+        .job-hero-title-group h1 {
+            font-size: 1.6rem;
+            color: var(--text-main);
+            margin-bottom: 0.2rem;
+            text-align: left;
+        }
+        .job-hero-company {
+            font-size: 1rem;
+            font-weight: bold;
+            color: var(--primary);
+            margin-bottom: 0.6rem;
+        }
+        .job-hero-badges {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+        .meta-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.3rem;
+            background-color: var(--bg-light-hover);
+            color: var(--text-muted);
+            padding: 0.3rem 0.7rem;
+            border-radius: 20px;
+            font-size: 0.82rem;
+            font-weight: bold;
+        }
+        .match-score-large {
+            background-color: #e6ffe6;
+            color: var(--success);
+            font-weight: bold;
+            padding: 0.6rem 1.25rem;
+            border-radius: 24px;
+            font-size: 1rem;
+            border: 1.5px solid var(--success);
+            white-space: nowrap;
+            align-self: flex-start;
+        }
+
+        /* Action row inside hero */
+        .job-hero-actions {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+            padding-top: 1.5rem;
+            border-top: 1px solid var(--border-light);
+            flex-wrap: wrap;
+        }
+
+        /* Section card */
+        .job-section-card { padding: 1.75rem; }
+        .job-section-card h2 {
+            font-size: 1rem;
+            color: var(--text-main);
+            margin-bottom: 1.25rem;
+            padding-bottom: 0.6rem;
+            border-bottom: 2px solid var(--border-light);
+        }
+
+        /* Description paragraphs */
+        .job-full-desc {
+            font-size: 0.95rem;
+            color: var(--text-muted);
+            line-height: 1.75;
+        }
+
+        /* Bullet lists */
+        .job-bullet-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 0.6rem;
+        }
+        .job-bullet-list li {
+            display: flex;
+            gap: 0.65rem;
+            font-size: 0.93rem;
+            color: var(--text-muted);
+            line-height: 1.5;
+        }
+        .job-bullet-list li::before {
+            content: '✦';
+            color: var(--primary);
+            font-size: 0.7rem;
+            margin-top: 0.3rem;
+            flex-shrink: 0;
+        }
+
+        /* Skills section */
+        .skills-match-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.6rem;
+        }
+        .skill-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            padding: 0.4rem 0.9rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: bold;
+            border: 1.5px solid;
+        }
+        .skill-chip.matched {
+            background-color: #e6ffe6;
+            color: var(--success);
+            border-color: var(--success);
+        }
+        .skill-chip.unmatched {
+            background-color: var(--bg-light-hover);
+            color: var(--text-muted);
+            border-color: var(--border-color);
+        }
+        .skill-chip.required-missing {
+            background-color: #fff3f3;
+            color: #c0392b;
+            border-color: #e74c3c;
+        }
+
+        /* Right sidebar */
+        .job-right-col { display: flex; flex-direction: column; gap: 1.5rem; }
+
+        /* Apply card */
+        .apply-card {
+            padding: 1.75rem;
+            background: linear-gradient(135deg, #f0f7ff 0%, #e8f4ff 100%);
+            border: 1.5px solid var(--primary-light);
+        }
+        .apply-card h3 {
+            font-size: 1rem;
+            margin-bottom: 0.5rem;
+            color: var(--text-main);
+        }
+        .apply-salary {
+            font-size: 1.4rem;
+            font-weight: bold;
+            color: var(--primary);
+            margin-bottom: 1.25rem;
+        }
+        .apply-card .btn-primary {
+            width: 100%;
+            margin-bottom: 0.75rem;
+            font-size: 1rem;
+            padding: 0.85rem;
+        }
+        .apply-card .btn-secondary { width: 100%; font-size: 0.9rem; }
+
+        .apply-card-meta {
+            margin-top: 1.25rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+        .apply-meta-row {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.82rem;
+        }
+        .apply-meta-row .label { color: var(--text-muted); }
+        .apply-meta-row .value { font-weight: bold; color: var(--text-main); }
+
+        /* Company about card */
+        .company-about-card { padding: 1.75rem; }
+        .company-about-card h3 {
+            font-size: 1rem;
+            margin-bottom: 1rem;
+            color: var(--text-main);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .company-logo-small {
+            width: 38px;
+            height: 38px;
+            border-radius: 8px;
+            background-color: var(--primary);
+            color: white;
+            font-weight: bold;
+            font-size: 0.85rem;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .company-about-text {
+            font-size: 0.88rem;
+            color: var(--text-muted);
+            line-height: 1.65;
+        }
+        .company-detail-row {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.82rem;
+            padding: 0.5rem 0;
+            border-bottom: 1px solid var(--border-light);
+        }
+        .company-detail-row:last-child { border-bottom: none; }
+        .company-detail-row .cd-label { color: var(--text-muted); }
+        .company-detail-row .cd-value { font-weight: bold; color: var(--text-main); }
+
+        /* Applied state banner */
+        .applied-banner {
+            display: none;
+            background-color: #e6ffe6;
+            border: 1.5px solid var(--success);
+            border-radius: var(--radius-card);
+            padding: 1rem 1.25rem;
+            color: var(--success);
+            font-weight: bold;
+            text-align: center;
+            margin-bottom: 0.75rem;
+        }
+        .applied-banner.show { display: block; }
+
+        /* Not-found state */
+        .not-found {
+            text-align: center;
+            padding: 4rem 2rem;
+            color: var(--text-muted);
+        }
+
+        /* Responsive */
+        @media (max-width: 860px) {
+            .job-detail-container { grid-template-columns: 1fr; }
+            .job-right-col { order: -1; }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <a href="/" class="header-logo-link">
+            <div class="itmp-logo-placeholder">
+                <img src="../../assests/images/ITMP.png" style="max-width: 100px;">
+            </div>
+            <!--<span class="header-title">ITMP</span>-->
+        </a>
+        <div class="header-search">
+            <input type="text" placeholder="Search for jobs..." class="quick-search-input">
+            <button class="btn-search-small">Search</button>
+        </div>
+        <div class="header-nav">
+            <a href="c_dashboard.html">Dashboard</a>
+            <a href="search_result.html">Browse Jobs</a>
+            <a href="#" onclick="DataService.logout();return false;">Sign Out</a>
+        </div>
+    </header>
+
+    <main class="job-detail-main dashboard-main">
+        <div style="width:100%;max-width:1100px;margin:0 auto;">
+            <a href="c_dashboard.html" class="back-link">← Back to Dashboard</a>
+        </div>
+
+        <!-- Content injected by JS -->
+        <div class="job-detail-container" id="job-detail-root"></div>
+
+        <!-- Not found fallback -->
+        <div class="not-found" id="not-found" style="display:none;">
+            <h2>Job Not Found</h2>
+            <p>This listing may have expired or been removed.</p>
+            <a href="c_dashboard.html" class="btn-primary" style="display:inline-block;margin-top:1rem;">Back to Dashboard</a>
+        </div>
+    </main>
+
+    <footer class="minimal-footer">
+        <div class="footer-links">
+            <a href="#">Terms of Service</a>
+            <a href="#">Privacy Policy</a>
+            <a href="#">Candidate Terms</a>
+        </div>
+        <div class="footer-copyright">&copy; 2026 ITMP. All rights reserved.</div>
+    </footer>
+
+    <script src="../../assests/js/data.js"></script>
+    <script>
+        function getJobIdFromURL() {
+            const params = new URLSearchParams(window.location.search);
+            return params.get('id');
+        }
+
+        function renderJobPage() {
+            DataService.onReady(() => {
+                const jobId = getJobIdFromURL();
+                const job   = DataService.getJobById(jobId);
+                const root  = document.getElementById('job-detail-root');
+
+                if (!job) {
+                    root.style.display = 'none';
+                    document.getElementById('not-found').style.display = 'block';
+                    return;
+                }
+
+                const user       = DataService.getCurrentUser();
+                const isApplied  = user?.applied_jobs?.includes(job.id) ?? false;
+                const isSaved    = user?.saved_jobs?.includes(job.id)   ?? false;
+                const skills     = DataService.getSkillsWithMatchStatus(job);
+                const posted     = DataService.timeAgo(job.posted_date);
+
+                document.title = `${job.title} at ${job.company} – ITMP`;
+
+                // Skill chips
+                const skillChipsHtml = skills.map(s => {
+                    let cls = s.isMatch ? 'matched' : (s.required ? 'required-missing' : 'unmatched');
+                    let icon = s.isMatch ? '✔' : (s.required ? '✕' : '○');
+                    return `<span class="skill-chip ${cls}">${icon} ${s.name}</span>`;
+                }).join('');
+
+                // Responsibilities
+                const responsibilitiesHtml = (job.responsibilities || []).map(r =>
+                    `<li>${r}</li>`).join('');
+
+                // Requirements
+                const requirementsHtml = (job.requirements || []).map(r =>
+                    `<li>${r}</li>`).join('');
+
+                // Nice to have
+                const niceHtml = (job.nice_to_have || []).map(r =>
+                    `<li>${r}</li>`).join('');
+
+                // Benefits
+                const benefitsHtml = (job.benefits || []).map(b =>
+                    `<li>${b}</li>`).join('');
+
+                // Apply button state
+                const applyBtnHtml = isApplied
+                    ? `<div class="applied-banner show">✔ You have applied for this role</div>
+                       <button class="btn-applied" disabled style="width:100%;padding:0.85rem;font-size:1rem;margin-bottom:0.75rem;">Applied</button>`
+                    : `<button class="btn-primary" style="width:100%;font-size:1rem;padding:0.85rem;margin-bottom:0.75rem;"
+                         onclick="handleApply('${job.id}')">One-Click Apply</button>`;
+
+                const saveLabel = isSaved ? '★ Saved' : '☆ Save for Later';
+
+                root.innerHTML = `
+                    <!-- LEFT COLUMN -->
+                    <div class="job-left-col">
+
+                        <!-- Hero -->
+                        <div class="card job-hero-card">
+                            <div class="job-hero-top">
+                                <div class="company-logo-large">${job.company_initials}</div>
+                                <div class="job-hero-title-group">
+                                    <h1>${job.title}</h1>
+                                    <div class="job-hero-company">${job.company}</div>
+                                    <div class="job-hero-badges">
+                                        <span class="meta-badge">📍 ${job.location}</span>
+                                        <span class="meta-badge">🖥️ ${job.work_mode}</span>
+                                        <span class="meta-badge">💼 ${job.job_type}</span>
+                                        <span class="meta-badge">🏢 ${job.industry}</span>
+                                        <span class="meta-badge">📅 Posted ${posted}</span>
+                                        <span class="meta-badge">👥 ${job.applications_count} applicants</span>
+                                    </div>
+                                </div>
+                                <div class="match-score-large">${job.match_score}% Match</div>
+                            </div>
+                            <div class="job-hero-actions">
+                                ${isApplied
+                                    ? `<button class="btn-applied" disabled>✔ Applied</button>`
+                                    : `<button class="btn-primary btn-sm" onclick="handleApply('${job.id}')">One-Click Apply</button>`
+                                }
+                                <button class="btn-secondary btn-sm" id="save-btn" onclick="handleSave('${job.id}')">
+                                    ${saveLabel}
+                                </button>
+                                <span style="color:var(--text-muted);font-size:0.85rem;margin-left:auto;">
+                                    Expires ${job.expires_date}
+                                </span>
+                            </div>
+                        </div>
+
+                        <!-- Full Description -->
+                        <div class="card job-section-card">
+                            <h2>About the Role</h2>
+                            <p class="job-full-desc">${job.full_description}</p>
+                        </div>
+
+                        <!-- Responsibilities -->
+                        <div class="card job-section-card">
+                            <h2>Key Responsibilities</h2>
+                            <ul class="job-bullet-list">${responsibilitiesHtml}</ul>
+                        </div>
+
+                        <!-- Requirements -->
+                        <div class="card job-section-card">
+                            <h2>Requirements</h2>
+                            <ul class="job-bullet-list">${requirementsHtml}</ul>
+                            ${niceHtml ? `
+                            <h2 style="margin-top:1.5rem;">Nice to Have</h2>
+                            <ul class="job-bullet-list">${niceHtml}</ul>` : ''}
+                        </div>
+
+                        <!-- Skills Match -->
+                        <div class="card job-section-card">
+                            <h2>Skills Match</h2>
+                            <div style="font-size:0.82rem;color:var(--text-muted);margin-bottom:1rem;">
+                                <span style="color:var(--success);font-weight:bold;">✔ Matched</span> &nbsp;
+                                <span style="color:#c0392b;font-weight:bold;">✕ Required – Missing</span> &nbsp;
+                                <span style="color:var(--text-muted);font-weight:bold;">○ Optional</span>
+                            </div>
+                            <div class="skills-match-grid">${skillChipsHtml}</div>
+                        </div>
+
+                        <!-- Benefits -->
+                        <div class="card job-section-card">
+                            <h2>Benefits & Perks</h2>
+                            <ul class="job-bullet-list">${benefitsHtml}</ul>
+                        </div>
+
+                    </div>
+
+                    <!-- RIGHT COLUMN -->
+                    <div class="job-right-col">
+
+                        <!-- Apply Card -->
+                        <div class="card apply-card">
+                            <h3>Salary Range</h3>
+                            <div class="apply-salary">${job.salary_display} <span style="font-size:0.8rem;color:var(--text-muted);font-weight:normal;">per year</span></div>
+                            <div id="apply-action-area">
+                                ${applyBtnHtml}
+                                <button class="btn-secondary" id="save-btn-sidebar" onclick="handleSave('${job.id}')">
+                                    ${saveLabel}
+                                </button>
+                            </div>
+                            <div class="apply-card-meta">
+                                <div class="apply-meta-row">
+                                    <span class="label">Job Type</span>
+                                    <span class="value">${job.job_type}</span>
+                                </div>
+                                <div class="apply-meta-row">
+                                    <span class="label">Work Mode</span>
+                                    <span class="value">${job.work_mode}</span>
+                                </div>
+                                <div class="apply-meta-row">
+                                    <span class="label">Location</span>
+                                    <span class="value">${job.location}</span>
+                                </div>
+                                <div class="apply-meta-row">
+                                    <span class="label">Applicants</span>
+                                    <span class="value">${job.applications_count}</span>
+                                </div>
+                                <div class="apply-meta-row">
+                                    <span class="label">Closes</span>
+                                    <span class="value">${job.expires_date}</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Company Card -->
+                        <div class="card company-about-card">
+                            <h3>
+                                <span class="company-logo-small">${job.company_initials}</span>
+                                ${job.company}
+                            </h3>
+                            <p class="company-about-text">${job.company_about}</p>
+                            <div style="margin-top:1.25rem;">
+                                <div class="company-detail-row">
+                                    <span class="cd-label">Industry</span>
+                                    <span class="cd-value">${job.industry}</span>
+                                </div>
+                                <div class="company-detail-row">
+                                    <span class="cd-label">Company Size</span>
+                                    <span class="cd-value">${job.company_size}</span>
+                                </div>
+                                <div class="company-detail-row">
+                                    <span class="cd-label">Location</span>
+                                    <span class="cd-value">${job.location}</span>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                `;
+            });
+        }
+
+        function handleApply(jobId) {
+            const success = DataService.applyForJob(jobId);
+            if (success) {
+                // Refresh the page content to reflect applied state
+                document.getElementById('job-detail-root').innerHTML = '';
+                renderJobPage();
+            }
+        }
+
+        function handleSave(jobId) {
+            DataService.toggleSaveJob(jobId);
+            document.getElementById('job-detail-root').innerHTML = '';
+            renderJobPage();
+        }
+
+        document.addEventListener('DOMContentLoaded', renderJobPage);
+    </script>
+</body>
+</html>

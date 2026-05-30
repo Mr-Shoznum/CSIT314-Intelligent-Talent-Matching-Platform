@@ -4,13 +4,281 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sign Up - Intelligent Talent Matching Platform</title>
-    <link rel="stylesheet" href="../assests/styling/signup.css">
+    <link rel="stylesheet" href="../assests/styling/global.css">
+    <link rel="icon" type="image/x-icon" href="../assests/images/ITMP-icon-logo.ico">
+    <style>
+        /* ── Sign-up page (built on global.css) ─────────────────────── */
+        .signup-card {
+            background-color: white;
+            padding: 2.5rem;
+            border-radius: var(--radius-card);
+            box-shadow: var(--shadow-card);
+            width: 100%;
+            max-width: 720px;
+        }
+        .signup-card h1 {
+            font-size: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        /* Two-column rows that collapse on small screens */
+        .input-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.25rem;
+        }
+        .input-row .input-group {
+            margin-bottom: 1.5rem;
+        }
+
+        /* ── Phone with custom country-code select ──────────────────── */
+        .phone-input-wrapper {
+            display: flex;
+            gap: 0.5rem;
+        }
+        .phone-input-wrapper input[type="tel"] {
+            flex-grow: 1;
+        }
+        .custom-select {
+            position: relative;
+            min-width: 110px;
+            flex-shrink: 0;
+        }
+        .custom-select .selected {
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-btn);
+            padding: 0.85rem;
+            font-size: 1rem;
+            cursor: pointer;
+            background: white;
+            white-space: nowrap;
+            user-select: none;
+        }
+        .custom-select .selected:hover {
+            border-color: var(--primary);
+        }
+        .custom-select .options {
+            display: none;
+            position: absolute;
+            top: calc(100% + 4px);
+            left: 0;
+            width: 320px;
+            max-width: 80vw;
+            max-height: 260px;
+            overflow-y: auto;
+            background: white;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-btn);
+            box-shadow: var(--shadow-card);
+            z-index: 50;
+        }
+        .custom-option {
+            padding: 0.6rem 0.85rem;
+            font-size: 0.9rem;
+            cursor: pointer;
+        }
+        .custom-option:hover {
+            background-color: var(--bg-light-hover);
+        }
+
+        /* ── Role selection ─────────────────────────────────────────── */
+        .role-label {
+            font-weight: bold;
+            margin-bottom: 0.75rem;
+            font-size: 0.95rem;
+        }
+        .role-buttons {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+        .btn-role {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.6rem;
+            padding: 1.5rem 1rem;
+            background: white;
+            border: 2px solid var(--border-color);
+            border-radius: var(--radius-card);
+            color: var(--text-main);
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .btn-role:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+            background-color: var(--bg-light-hover);
+        }
+        .btn-back {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            font-weight: bold;
+            font-size: 0.9rem;
+            cursor: pointer;
+            margin-bottom: 1.5rem;
+            padding: 0;
+        }
+        .btn-back:hover {
+            color: var(--primary);
+        }
+
+        /* ── Resume upload dropzone ─────────────────────────────────── */
+        .resume-upload-container {
+            margin-bottom: 1.5rem;
+        }
+        .upload-title {
+            font-weight: bold;
+            margin-bottom: 0.75rem;
+            font-size: 0.95rem;
+        }
+        .upload-dropzone {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            gap: 0.4rem;
+            padding: 2rem 1rem;
+            border: 2px dashed var(--border-color);
+            border-radius: var(--radius-card);
+            color: var(--text-muted);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .upload-dropzone:hover,
+        .upload-dropzone.dragover {
+            border-color: var(--primary);
+            background-color: var(--bg-light-hover);
+            color: var(--primary);
+        }
+        .upload-dropzone p { margin: 0; }
+        .file-hint {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+        #file-name-display {
+            font-size: 0.9rem;
+            font-weight: bold;
+            margin-top: 0.5rem;
+        }
+
+        /* ── "OR" divider ───────────────────────────────────────────── */
+        .divider {
+            display: flex;
+            align-items: center;
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 0.8rem;
+            font-weight: bold;
+            letter-spacing: 0.5px;
+            margin: 1.5rem 0;
+        }
+        .divider::before,
+        .divider::after {
+            content: "";
+            flex: 1;
+            border-bottom: 1px solid var(--border-light);
+        }
+        .divider span {
+            padding: 0 1rem;
+        }
+
+        /* ── Membership tier selector ───────────────────────────────── */
+        .membership-label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 0.75rem;
+            font-size: 0.95rem;
+        }
+        .membership-cards {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+        .membership-card {
+            position: relative;
+            display: block;
+            border: 2px solid var(--border-color);
+            border-radius: var(--radius-card);
+            padding: 1.25rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .membership-card:hover {
+            border-color: var(--primary);
+        }
+        .membership-card input[type="radio"] {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            accent-color: var(--primary);
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+        .membership-card:has(input:checked) {
+            border-color: var(--primary);
+            background-color: var(--bg-light-hover);
+        }
+        .card-content h4 {
+            font-size: 1rem;
+            margin-bottom: 0.25rem;
+            color: var(--text-main);
+        }
+        .card-content p {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-bottom: 0.75rem;
+        }
+        .card-content .price {
+            font-weight: bold;
+            color: var(--primary);
+            font-size: 1.05rem;
+        }
+
+        /* ── Footer link beneath form ───────────────────────────────── */
+        .login-link {
+            margin-top: 1.5rem;
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 0.95rem;
+        }
+        .login-link a {
+            color: var(--primary);
+            font-weight: bold;
+        }
+        .login-link a:hover {
+            text-decoration: underline;
+        }
+
+        /* The role/section reveals can be tall — allow them room */
+        #candidate-section.show { max-height: 2400px; }
+
+        @media (max-width: 600px) {
+            .input-row,
+            .role-buttons,
+            .membership-cards {
+                grid-template-columns: 1fr;
+            }
+            .signup-card { padding: 1.75rem; }
+        }
+    </style>
 </head>
 <body>
 
     <header>
         <a href="index.html" class="header-logo-link">
-            <img class="itmp-logo-placeholder" src="../assests/images/ITMP-clear-header-logo.png" alt="[ITMP Logo Placeholder]">
+            <div class="itmp-logo-placeholder">
+                <img src="../assests/images/ITMP.png" style="max-width: 100px;">
+            </div>
+            <!--<span class="header-title">ITMP</span>-->
         </a>
     </header>
 
@@ -606,40 +874,108 @@
         function handleFiles(files) {
             if (files.length > 0) {
                 const file = files[0];
-                fileNameDisplay.style.color = "#0056b3";
-                fileNameDisplay.textContent = "Processing: " + file.name + "...";
-                
-                // SIMULATE BACKEND PARSER DELAY
-                setTimeout(() => {
-                    simulateResumeParsing(file.name);
-                }, 1500);
+                fileNameDisplay.style.color = '#0056b3';
+                fileNameDisplay.textContent = 'Uploading and parsing: ' + file.name + '…';
+                parseResume(file);
             }
         }
 
-        function simulateResumeParsing(filename) {
-            fileNameDisplay.style.color = "#008a00";
-            fileNameDisplay.textContent = "✅ Success: " + filename + " parsed. Please review your details below.";
-            
-            // Auto-fill the form with simulated parsed data
-            document.getElementById('first-name').value = "Jane";
-            document.getElementById('last-name').value = "Doe";
-            document.getElementById('education').value = "Bachelor of Software Engineering";
-            document.getElementById('major').value = "Software Engineering";
-            document.getElementById('years-experience').value = "4";
-            document.getElementById('skills').value = "JavaScript, Python, React, SQL, Agile";
-            document.getElementById('work-experience').value = "Full Stack Developer at TechSolutions (2022 - Present)\n- Developed responsive web applications using React and Node.js.\n- Optimized SQL queries improving database performance by 20%.";
-            
-            // Flash the inputs briefly to show the user they were auto-filled
-            const fieldsToFlash = ['first-name', 'last-name', 'education', 'major', 'years-experience', 'skills', 'work-experience'];
-            fieldsToFlash.forEach(id => {
-                const el = document.getElementById(id);
-                el.style.transition = "background-color 0.3s";
-                el.style.backgroundColor = "#e6ffe6"; 
-                setTimeout(() => {
-                    el.style.backgroundColor = "white"; 
-                }, 1200);
-            });
+        async function parseResume(file) {
+            const form = new FormData();
+            form.append('resume', file);
+            try {
+                const res  = await fetch('/api/parse-resume', { method: 'POST', body: form });
+                const data = await res.json();
+                if (!res.ok) throw new Error(data.error || 'Parse failed');
+
+                fileNameDisplay.style.color = '#008a00';
+                fileNameDisplay.textContent = '✅ ' + file.name + ' parsed. Review your details below.';
+
+                if (data.name) {
+                    const parts = data.name.split(' ');
+                    document.getElementById('first-name').value = parts[0] || '';
+                    document.getElementById('last-name').value  = parts.slice(1).join(' ') || '';
+                }
+                if (data.skills?.length)
+                    document.getElementById('skills').value = data.skills.join(', ');
+                if (data.experience?.length)
+                    document.getElementById('work-experience').value = data.experience.join('\n');
+                if (data.education?.length)
+                    document.getElementById('education').value = data.education[0] || '';
+
+                const fieldsToFlash = ['first-name', 'last-name', 'education', 'skills', 'work-experience'];
+                fieldsToFlash.forEach(id => {
+                    const el = document.getElementById(id);
+                    if (!el) return;
+                    el.style.transition = 'background-color 0.3s';
+                    el.style.backgroundColor = '#e6ffe6';
+                    setTimeout(() => { el.style.backgroundColor = 'white'; }, 1200);
+                });
+            } catch {
+                fileNameDisplay.style.color = '#c0392b';
+                fileNameDisplay.textContent = '⚠ Could not parse ' + file.name + '. Please fill in manually.';
+            }
         }
+
+        // --- FORM SUBMISSION ---
+        document.getElementById('signup-form').addEventListener('submit', async function(e) {
+            e.preventDefault();
+
+            const isCandidate = document.getElementById('candidate-section').classList.contains('show');
+            const isEmployer  = document.getElementById('employer-section').classList.contains('show');
+            if (!isCandidate && !isEmployer) {
+                alert('Please select a role (Candidate or Employer) first.');
+                return;
+            }
+
+            const email    = document.getElementById('email').value.trim();
+            const password = document.getElementById('password').value;
+            const confirm  = document.getElementById('confirm-password').value;
+            const phone    = (document.getElementById('country-code').value || '+61') +
+                             document.getElementById('phone').value.trim();
+
+            if (password !== confirm) { alert('Passwords do not match.'); return; }
+
+            const body = { email, password, phone };
+
+            if (isCandidate) {
+                body.account_type  = 'candidate';
+                body.first_name    = document.getElementById('first-name').value.trim();
+                body.last_name     = document.getElementById('last-name').value.trim();
+                body.yoe           = document.getElementById('years-experience').value || 0;
+                body.skills        = document.getElementById('skills').value.trim();
+            } else {
+                body.account_type    = 'company';
+                body.company_name    = document.getElementById('company-name').value.trim();
+                body.abn             = document.getElementById('abn').value.trim();
+                body.company_industry = document.getElementById('company-industry').value;
+                body.company_website  = document.getElementById('company-website').value.trim();
+            }
+
+            const submitBtn = this.querySelector('[type=submit]:not([disabled])');
+            if (submitBtn) { submitBtn.textContent = 'Creating account…'; submitBtn.disabled = true; }
+
+            try {
+                const res  = await fetch('/api/auth/register', {
+                    method:  'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body:    JSON.stringify(body),
+                });
+                const data = await res.json();
+                if (!res.ok) {
+                    alert(data.error || 'Registration failed.');
+                    if (submitBtn) { submitBtn.textContent = isCandidate ? 'Create Candidate Account' : 'Create Employer Account'; submitBtn.disabled = false; }
+                    return;
+                }
+                localStorage.setItem('itmp_user', JSON.stringify(data));
+                window.location.href = data.account_type === 'company'
+                    ? '/pages/auth/e_dashboard.html'
+                    : '/pages/auth/c_dashboard.html';
+            } catch {
+                alert('Could not reach server. Make sure the backend is running.');
+                if (submitBtn) { submitBtn.textContent = isCandidate ? 'Create Candidate Account' : 'Create Employer Account'; submitBtn.disabled = false; }
+            }
+        });
     </script>
 </body>
 </html>

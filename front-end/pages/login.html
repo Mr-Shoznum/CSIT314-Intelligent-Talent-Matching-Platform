@@ -4,25 +4,74 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login - Intelligent Talent Matching Platform</title>
-    <link rel="stylesheet" href="../assests/styling/login.css">
+    <link rel="stylesheet" href="../assests/styling/global.css">
+    <link rel="icon" type="image/x-icon" href="../assests/images/ITMP-icon-logo.ico">
+    <style>
+        /* ── Auth card (built on global .card) ──────────────────────── */
+        .auth-card {
+            max-width: 440px;
+        }
+        .auth-card h1 {
+            font-size: 2rem;
+            margin-bottom: 2rem;
+        }
+        .btn-signin {
+            width: 100%;
+            background-color: var(--primary-light);
+            color: white;
+            border: none;
+            padding: 1rem;
+            font-size: 1.125rem;
+            font-weight: bold;
+            border-radius: var(--radius-btn);
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        .btn-signin:hover {
+            background-color: var(--primary-hover);
+        }
+        .register-link {
+            margin-top: 1.5rem;
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 0.95rem;
+        }
+        .register-link a {
+            color: var(--primary);
+            font-weight: bold;
+        }
+        .register-link a:hover {
+            text-decoration: underline;
+        }
+        .form-hint {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-top: -0.75rem;
+            margin-bottom: 1rem;
+        }
+    </style>
 </head>
 <body>
 
     <header>
         <a href="index.html" class="header-logo-link">
-            <img class="itmp-logo-placeholder" src="../assests/images/ITMP.png" alt="[ITMP Logo Placeholder]">
+            <div class="itmp-logo-placeholder">
+                <img src="../assests/images/ITMP.png" style="max-width: 100px;">
+            </div>
+            <!--<span class="header-title">ITMP</span>-->
         </a>
     </header>
 
     <main>
-        <div class="login-card">
+        <div class="card auth-card">
             <h1>Login</h1>
-            
+
             <form id="login-form">
                 <div class="input-group">
                     <label for="email">Email or Username</label>
                     <input type="text" id="email" name="email" placeholder="Email or Username" required>
                 </div>
+                <p class="form-hint">Press Enter to continue.</p>
 
                 <div class="reveal-container" id="password-container">
                     <div class="input-group">
@@ -34,7 +83,7 @@
                 </div>
             </form>
 
-            <p class="register-link">Don’t have an account? <a href="#">Register</a></p>
+            <p class="register-link">Don’t have an account? <a href="register.html">Register</a></p>
         </div>
     </main>
 
@@ -57,17 +106,49 @@
         const passwordContainer = document.getElementById('password-container');
         const passwordInput = document.getElementById('password');
 
+        function revealPassword() {
+            if (emailInput.value.trim() !== '') {
+                passwordContainer.classList.add('show');
+                setTimeout(() => passwordInput.focus(), 300);
+            }
+        }
+
         emailInput.addEventListener('keydown', function(event) {
             if (event.key === 'Enter') {
-                event.preventDefault(); 
-                
-                if (this.value.trim() !== '') {
-                    passwordContainer.classList.add('show');
-                    
-                    setTimeout(() => {
-                        passwordInput.focus();
-                    }, 300); 
+                event.preventDefault();
+                revealPassword();
+            }
+        });
+
+        document.getElementById('login-form').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const email    = document.getElementById('email').value.trim();
+            const password = document.getElementById('password').value;
+            const btn      = this.querySelector('.btn-signin');
+            btn.textContent = 'Signing in…';
+            btn.disabled    = true;
+
+            try {
+                const res = await fetch('/api/auth/login', {
+                    method:  'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body:    JSON.stringify({ email, password }),
+                });
+                const data = await res.json();
+                if (!res.ok) {
+                    alert(data.error || 'Login failed.');
+                    btn.textContent = 'Sign in';
+                    btn.disabled    = false;
+                    return;
                 }
+                localStorage.setItem('itmp_user', JSON.stringify(data));
+                window.location.href = data.account_type === 'company'
+                    ? '/pages/auth/e_dashboard.html'
+                    : '/pages/auth/c_dashboard.html';
+            } catch {
+                alert('Could not reach server. Make sure the backend is running.');
+                btn.textContent = 'Sign in';
+                btn.disabled    = false;
             }
         });
     </script>

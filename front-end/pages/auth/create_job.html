@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Post a Job – ITMP</title>
+    <link rel="stylesheet" href="../../assests/styling/global.css">
+    <link rel="stylesheet" href="../../assests/styling/dashboard.css">
+    <link rel="icon" type="image/x-icon" href="../../assests/images/ITMP-icon-logo.ico">
+    <style>
+        .create-main { padding: 2rem; align-items: flex-start; }
+        .create-container { width: 100%; max-width: 820px; margin: 0 auto; display: flex; flex-direction: column; gap: 1.5rem; }
+
+        .back-link { display: inline-flex; align-items: center; gap: 0.4rem; color: var(--primary); font-weight: bold; font-size: 0.9rem; text-decoration: none; margin-bottom: 0.25rem; }
+        .back-link:hover { text-decoration: underline; }
+
+        /* Page hero (matches the gradient banner used elsewhere) */
+        .create-hero {
+            padding: 2rem 2.5rem;
+            background: linear-gradient(135deg, #ffffff 0%, var(--bg-light-hover) 100%);
+            border-left: 5px solid var(--primary);
+        }
+        .create-hero h1 { font-size: 1.6rem; margin-bottom: 0.35rem; color: var(--text-main); text-align: left; }
+        .create-hero p { color: var(--text-muted); font-size: 0.95rem; }
+
+        /* Form card sections */
+        .form-section-card { padding: 2rem; }
+        .form-section-card h2 {
+            font-size: 1.05rem; color: var(--text-main);
+            margin-bottom: 1.5rem; padding-bottom: 0.75rem;
+            border-bottom: 2px solid var(--border-light);
+            display: flex; align-items: center; gap: 0.5rem;
+        }
+
+        .form-group { margin-bottom: 1.25rem; }
+        .form-group:last-child { margin-bottom: 0; }
+        .form-group label { display: block; font-size: 0.82rem; text-transform: uppercase; letter-spacing: 0.5px; font-weight: bold; color: var(--text-muted); margin-bottom: 0.4rem; }
+        .form-group .req { color: #c0392b; }
+        .form-group input, .form-group select, .form-group textarea {
+            width: 100%; padding: 0.7rem 0.9rem; border: 1.5px solid var(--border-color);
+            border-radius: var(--radius-btn); font-size: 0.95rem; font-family: inherit;
+            color: var(--text-main); background: white; box-sizing: border-box; outline: none; transition: border-color 0.2s;
+        }
+        .form-group input:focus, .form-group select:focus, .form-group textarea:focus { border-color: var(--primary); }
+        .form-group textarea { resize: vertical; min-height: 110px; line-height: 1.6; }
+        .field-hint { font-size: 0.8rem; color: var(--text-muted); margin-top: 0.35rem; }
+        .field-error { font-size: 0.8rem; color: #c0392b; margin-top: 0.35rem; display: none; }
+        .form-group.invalid input, .form-group.invalid select, .form-group.invalid textarea { border-color: #e74c3c; }
+        .form-group.invalid .field-error { display: block; }
+
+        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1.25rem; }
+        .form-row-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1.25rem; }
+
+        /* Skills tag editor */
+        .skills-input-wrap { display: flex; gap: 0.5rem; }
+        .skills-input-wrap input { flex: 1; }
+        .skills-tags { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 0.75rem; }
+        .skill-edit-tag {
+            display: inline-flex; align-items: center; gap: 0.4rem;
+            background: var(--bg-main); border: 1.5px solid var(--primary); color: var(--primary);
+            padding: 0.3rem 0.4rem 0.3rem 0.75rem; border-radius: 20px; font-size: 0.85rem; font-weight: bold;
+        }
+        .skill-edit-tag button { background: none; border: none; color: var(--primary); cursor: pointer; font-size: 1rem; line-height: 1; padding: 0 0.2rem; }
+        .skill-edit-tag button:hover { color: #c0392b; }
+
+        /* Sticky-ish action bar */
+        .form-actions {
+            display: flex; justify-content: flex-end; gap: 0.75rem; align-items: center;
+            padding: 1.25rem 0; flex-wrap: wrap;
+        }
+        .form-actions .spacer { margin-right: auto; color: var(--text-muted); font-size: 0.85rem; }
+
+        /* Success banner */
+        .success-banner {
+            display: none; background-color: #e6ffe6; border: 1.5px solid var(--success);
+            border-radius: var(--radius-card); padding: 1.25rem 1.5rem; color: var(--success);
+            font-weight: bold; text-align: center;
+        }
+        .success-banner.show { display: block; }
+        .success-banner a { color: var(--primary); }
+
+        @media (max-width: 700px) {
+            .form-row, .form-row-3 { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <a href="e_dashboard.html" class="header-logo-link">
+            <div class="itmp-logo-placeholder">
+                <img src="../../assests/images/ITMP.png" style="max-width: 100px;">
+            </div>
+            <!--<span class="header-title">ITMP</span>-->
+        </a>
+        <div class="header-search">
+            <input type="text" placeholder="Search for candidates..." class="quick-search-input" id="header-search">
+            <button class="btn-search-small"
+                onclick="window.location.href='search_result.html?mode=candidates&role=employer&q='+encodeURIComponent(document.getElementById('header-search').value)">Search</button>
+        </div>
+        <div class="header-nav">
+            <a href="e_dashboard.html">Dashboard</a>
+            <a href="search_result.html?mode=candidates&role=employer">Browse Candidates</a>
+            <a href="#" onclick="DataService.logout();return false;">Sign Out</a>
+        </div>
+    </header>
+
+    <main class="create-main dashboard-main">
+        <div class="create-container">
+
+            <a href="e_dashboard.html" class="back-link">← Back to Dashboard</a>
+
+            <!-- Success state -->
+            <div class="success-banner" id="success-banner">
+                ✔ Your job posting is live! &nbsp;
+                <a href="e_dashboard.html">Return to dashboard</a> &nbsp;·&nbsp;
+                <a href="#" onclick="resetForm();return false;">Post another</a>
+            </div>
+
+            <!-- Hero -->
+            <div class="card create-hero">
+                <h1>Post a New Job</h1>
+                <p>Create a listing and we'll start matching it with relevant candidates right away.</p>
+            </div>
+
+            <!-- Form -->
+            <form id="create-job-form" novalidate>
+
+                <!-- Role basics -->
+                <div class="card form-section-card">
+                    <h2>📝 Role Details</h2>
+
+                    <div class="form-group" id="fg-title">
+                        <label>Job Title <span class="req">*</span></label>
+                        <input type="text" id="job-title" placeholder="e.g. Senior Software Engineer">
+                        <div class="field-error">Please enter a job title.</div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group" id="fg-type">
+                            <label>Job Type <span class="req">*</span></label>
+                            <select id="job-type">
+                                <option value="">Select…</option>
+                                <option>Full-time</option>
+                                <option>Part-time</option>
+                                <option>Contract</option>
+                                <option>Casual</option>
+                                <option>Internship</option>
+                            </select>
+                            <div class="field-error">Please select a job type.</div>
+                        </div>
+                        <div class="form-group">
+                            <label>Work Mode <span class="req">*</span></label>
+                            <select id="work-mode">
+                                <option>Remote</option>
+                                <option>Hybrid</option>
+                                <option>On-site</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group" id="fg-location">
+                            <label>Location <span class="req">*</span></label>
+                            <input type="text" id="location" placeholder="e.g. Sydney, NSW">
+                            <div class="field-error">Please enter a location.</div>
+                        </div>
+                        <div class="form-group">
+                            <label>Industry</label>
+                            <input type="text" id="industry" placeholder="e.g. Software / SaaS">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Compensation -->
+                <div class="card form-section-card">
+                    <h2>💰 Compensation</h2>
+                    <div class="form-row-3">
+                        <div class="form-group">
+                            <label>Min Salary (AUD)</label>
+                            <input type="number" id="salary-min" min="0" step="1000" placeholder="90000">
+                        </div>
+                        <div class="form-group">
+                            <label>Max Salary (AUD)</label>
+                            <input type="number" id="salary-max" min="0" step="1000" placeholder="120000">
+                        </div>
+                        <div class="form-group">
+                            <label>Period</label>
+                            <select id="salary-period">
+                                <option>per year</option>
+                                <option>per hour</option>
+                                <option>per day</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="field-hint">Leave salary blank to display "Competitive".</div>
+                </div>
+
+                <!-- Description -->
+                <div class="card form-section-card">
+                    <h2>📄 Description</h2>
+
+                    <div class="form-group" id="fg-desc">
+                        <label>About the Role <span class="req">*</span></label>
+                        <textarea id="full-description" placeholder="Describe the role, your team, and what makes this opportunity exciting…"></textarea>
+                        <div class="field-error">Please enter a role description.</div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Key Responsibilities</label>
+                        <textarea id="responsibilities" placeholder="One per line…"></textarea>
+                        <div class="field-hint">Enter one responsibility per line — each becomes a bullet point.</div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Requirements</label>
+                        <textarea id="requirements" placeholder="One per line…"></textarea>
+                        <div class="field-hint">Enter one requirement per line.</div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Benefits &amp; Perks</label>
+                        <textarea id="benefits" placeholder="One per line…"></textarea>
+                        <div class="field-hint">Enter one benefit per line.</div>
+                    </div>
+                </div>
+
+                <!-- Skills -->
+                <div class="card form-section-card">
+                    <h2>🛠️ Required Skills</h2>
+                    <div class="form-group">
+                        <label>Add Skills</label>
+                        <div class="skills-input-wrap">
+                            <input type="text" id="skill-input" placeholder="Type a skill and press Enter (e.g. React)">
+                            <button type="button" class="btn-secondary btn-sm" onclick="addSkill()">Add</button>
+                        </div>
+                        <div class="field-hint">These skills power candidate matching for this role.</div>
+                        <div class="skills-tags" id="skills-tags"></div>
+                    </div>
+                </div>
+
+                <!-- Settings -->
+                <div class="card form-section-card">
+                    <h2>⚙️ Listing Settings</h2>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Status</label>
+                            <select id="status">
+                                <option>Open</option>
+                                <option>Draft</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Application Deadline</label>
+                            <input type="date" id="expires-date">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Actions -->
+                <div class="form-actions">
+                    <span class="spacer">Fields marked <span class="req">*</span> are required.</span>
+                    <a href="e_dashboard.html" class="btn-secondary btn-sm" style="text-decoration:none;">Cancel</a>
+                    <button type="submit" class="btn-primary btn-sm">Publish Job</button>
+                </div>
+
+            </form>
+        </div>
+    </main>
+
+    <footer class="minimal-footer">
+        <div class="footer-links">
+            <a href="#">Terms of Service</a>
+            <a href="#">Privacy Policy</a>
+            <a href="#">Employer Terms</a>
+        </div>
+        <div class="footer-copyright">&copy; 2026 Intelligent Talent Matching Platform (ITMP). All rights reserved.</div>
+    </footer>
+
+    <script src="../../assests/js/data.js"></script>
+    <script>
+        /* ===================================================================
+           CREATE JOB
+           Submits via DataService.createJob(jobData) if present; otherwise
+           logs the payload and shows the success state so the page is usable
+           before the employer API exists. See EMPLOYER_API_NOTES.md.
+           =================================================================== */
+
+        let skills = [];
+
+        // ── Skills tag editor ─────────────────────────────────────────
+        function renderSkills() {
+            document.getElementById('skills-tags').innerHTML = skills.map((s, i) => `
+                <span class="skill-edit-tag">${s}<button type="button" onclick="removeSkill(${i})" aria-label="Remove ${s}">✕</button></span>
+            `).join('');
+        }
+        function addSkill() {
+            const input = document.getElementById('skill-input');
+            const val = input.value.trim();
+            if (val && !skills.some(s => s.toLowerCase() === val.toLowerCase())) {
+                skills.push(val);
+                renderSkills();
+            }
+            input.value = '';
+            input.focus();
+        }
+        function removeSkill(i) { skills.splice(i, 1); renderSkills(); }
+        document.getElementById('skill-input').addEventListener('keydown', e => {
+            if (e.key === 'Enter') { e.preventDefault(); addSkill(); }
+        });
+
+        // ── Helpers ───────────────────────────────────────────────────
+        function linesToArray(id) {
+            return document.getElementById(id).value
+                .split('\n').map(l => l.trim()).filter(Boolean);
+        }
+        function buildSalaryDisplay(min, max, period) {
+            const fmt = n => '$' + Number(n).toLocaleString();
+            if (min && max) return `${fmt(min)} – ${fmt(max)} ${period}`;
+            if (min)        return `${fmt(min)}+ ${period}`;
+            if (max)        return `Up to ${fmt(max)} ${period}`;
+            return 'Competitive';
+        }
+        function setInvalid(fgId, on) {
+            document.getElementById(fgId).classList.toggle('invalid', on);
+        }
+
+        // ── Validation ────────────────────────────────────────────────
+        function validate() {
+            let ok = true;
+            const checks = [
+                ['fg-title',    'job-title'],
+                ['fg-type',     'job-type'],
+                ['fg-location', 'location'],
+                ['fg-desc',     'full-description'],
+            ];
+            checks.forEach(([fg, field]) => {
+                const empty = !document.getElementById(field).value.trim();
+                setInvalid(fg, empty);
+                if (empty) ok = false;
+            });
+            return ok;
+        }
+
+        // ── Submit ────────────────────────────────────────────────────
+        document.getElementById('create-job-form').addEventListener('submit', async e => {
+            e.preventDefault();
+            if (!validate()) {
+                document.querySelector('.invalid')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                return;
+            }
+
+            const min = document.getElementById('salary-min').value;
+            const max = document.getElementById('salary-max').value;
+            const period = document.getElementById('salary-period').value;
+
+            const jobData = {
+                title:            document.getElementById('job-title').value.trim(),
+                job_type:         document.getElementById('job-type').value,
+                work_mode:        document.getElementById('work-mode').value,
+                location:         document.getElementById('location').value.trim(),
+                industry:         document.getElementById('industry').value.trim(),
+                salary_min:       min ? +min : null,
+                salary_max:       max ? +max : null,
+                salary_display:   buildSalaryDisplay(min, max, period),
+                full_description: document.getElementById('full-description').value.trim(),
+                responsibilities: linesToArray('responsibilities'),
+                requirements:     linesToArray('requirements'),
+                benefits:         linesToArray('benefits'),
+                skills:           skills.slice(),
+                status:           document.getElementById('status').value,
+                expires_date:     document.getElementById('expires-date').value || null,
+                posted_date:      new Date().toISOString(),
+            };
+
+            let saved = true;
+            if (DataService && DataService.createJob) {
+                try { saved = (await DataService.createJob(jobData)) !== false; }
+                catch (err) { console.error(err); saved = false; }
+            } else {
+                console.log('createJob payload (no DataService.createJob yet):', jobData);
+            }
+
+            if (saved) {
+                document.getElementById('create-job-form').style.display = 'none';
+                const banner = document.getElementById('success-banner');
+                banner.classList.add('show');
+                banner.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+        });
+
+        function resetForm() {
+            const form = document.getElementById('create-job-form');
+            form.reset();
+            skills = [];
+            renderSkills();
+            document.querySelectorAll('.form-group.invalid').forEach(el => el.classList.remove('invalid'));
+            document.getElementById('success-banner').classList.remove('show');
+            form.style.display = '';
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // ── Boot: prefill industry/location from employer if available ──
+        document.addEventListener('DOMContentLoaded', () => {
+            if (window.DataService && DataService.onReady) {
+                DataService.onReady(() => {
+                    const emp = DataService.getCurrentEmployer && DataService.getCurrentEmployer();
+                    if (emp) {
+                        if (emp.industry) document.getElementById('industry').value = emp.industry;
+                        if (emp.location) document.getElementById('location').value = emp.location;
+                    }
+                });
+            }
+            renderSkills();
+        });
+    </script>
+</body>
+</html>
