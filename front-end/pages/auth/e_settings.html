@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Settings – ITMP</title>
+    <link rel="stylesheet" href="../../assests/styling/global.css">
+    <link rel="stylesheet" href="../../assests/styling/dashboard.css">
+    <link rel="icon" type="image/x-icon" href="../../assests/images/ITMP-icon-logo.ico">
+    <style>
+        .settings-main { padding: 2rem; flex-direction: column; align-items: center; justify-content: flex-start; }
+        .settings-container { width: 100%; max-width: 1000px; display: grid; grid-template-columns: 220px 1fr; gap: 2rem; align-items: start; }
+        .back-link { display: block; color: var(--primary); font-weight: bold; font-size: 0.9rem; text-decoration: none; margin-bottom: 1rem; }
+        .back-link:hover { text-decoration: underline; }
+        .settings-nav { display: flex; flex-direction: column; gap: 0.25rem; }
+        .settings-nav-item { display: flex; align-items: center; gap: 0.6rem; padding: 0.65rem 1rem; border-radius: var(--radius-btn); font-size: 0.9rem; font-weight: bold; color: var(--text-muted); cursor: pointer; border: none; background: none; width: 100%; text-align: left; transition: all 0.15s; }
+        .settings-nav-item:hover { background: var(--bg-light-hover); color: var(--text-main); }
+        .settings-nav-item.active { background: #e8f0ff; color: var(--primary); }
+        .settings-nav-item .nav-icon { font-size: 1.1rem; width: 22px; text-align: center; }
+        .nav-divider { height: 1px; background: var(--border-light); margin: 0.5rem 0; }
+        .nav-danger { color: #c0392b !important; }
+        .nav-danger:hover { background: #fff3f3 !important; color: #c0392b !important; }
+        .nav-danger.active { background: #fff3f3 !important; color: #c0392b !important; }
+        .settings-panel { display: flex; flex-direction: column; gap: 1.5rem; }
+        .settings-section { display: none; flex-direction: column; gap: 1.5rem; }
+        .settings-section.active { display: flex; }
+        .settings-card { padding: 2rem; }
+        .settings-card h2 { font-size: 1.1rem; color: var(--text-main); margin-bottom: 0.4rem; display: flex; align-items: center; gap: 0.5rem; }
+        .settings-card .card-subtitle { font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1.5rem; }
+        .form-group { margin-bottom: 1.1rem; }
+        .form-group:last-child { margin-bottom: 0; }
+        .form-group label { display: block; font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.5px; font-weight: bold; color: var(--text-muted); margin-bottom: 0.35rem; }
+        .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 0.6rem 0.9rem; border: 1.5px solid var(--border-color); border-radius: var(--radius-btn); font-size: 0.95rem; font-family: inherit; color: var(--text-main); background: white; box-sizing: border-box; outline: none; transition: border-color 0.2s; }
+        .form-group input:focus, .form-group select:focus, .form-group textarea:focus { border-color: var(--primary); }
+        .form-group textarea { resize: vertical; min-height: 70px; }
+        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+        .settings-actions { display: flex; justify-content: flex-end; gap: 0.75rem; margin-top: 1.5rem; padding-top: 1.25rem; border-top: 1px solid var(--border-light); }
+        .btn-save { background: var(--primary); color: white; border: none; padding: 0.65rem 1.5rem; border-radius: var(--radius-btn); font-weight: bold; font-size: 0.9rem; cursor: pointer; transition: background 0.2s; }
+        .btn-save:hover { background: var(--primary-hover); }
+        .btn-cancel-action { background: white; color: var(--text-muted); border: 1.5px solid var(--border-color); padding: 0.65rem 1.25rem; border-radius: var(--radius-btn); font-weight: bold; font-size: 0.9rem; cursor: pointer; transition: all 0.2s; }
+        .btn-cancel-action:hover { border-color: var(--primary); color: var(--primary); }
+        .avatar-preview-row { display: flex; align-items: center; gap: 2rem; margin-bottom: 1.5rem; }
+        .avatar-preview-large { width: 90px; height: 90px; border-radius: 50%; color: white; font-weight: bold; font-size: 2rem; display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: background 0.3s; }
+        .avatar-desc { font-size: 0.88rem; color: var(--text-muted); line-height: 1.5; }
+        .color-swatch-grid { display: grid; grid-template-columns: repeat(8, 36px); gap: 0.5rem; margin-top: 0.75rem; }
+        .color-swatch { width: 36px; height: 36px; border-radius: 50%; cursor: pointer; border: 3px solid transparent; transition: transform 0.15s, border-color 0.15s; }
+        .color-swatch:hover { transform: scale(1.12); }
+        .color-swatch.selected { border-color: var(--text-main); transform: scale(1.12); }
+        .toggle-row { display: flex; justify-content: space-between; align-items: center; padding: 0.9rem 0; border-bottom: 1px solid var(--border-light); }
+        .toggle-row:last-child { border-bottom: none; padding-bottom: 0; }
+        .toggle-row:first-child { padding-top: 0; }
+        .toggle-info .toggle-title { font-weight: bold; font-size: 0.9rem; color: var(--text-main); }
+        .toggle-info .toggle-desc  { font-size: 0.82rem; color: var(--text-muted); margin-top: 0.15rem; }
+        .toggle-switch { position: relative; width: 40px; height: 22px; }
+        .toggle-switch input { display: none; }
+        .toggle-slider { position: absolute; inset: 0; background: var(--border-color); border-radius: 22px; cursor: pointer; transition: background 0.2s; }
+        .toggle-slider::after { content: ''; position: absolute; left: 3px; top: 3px; width: 16px; height: 16px; border-radius: 50%; background: white; transition: transform 0.2s; }
+        .toggle-switch input:checked + .toggle-slider { background: var(--primary); }
+        .toggle-switch input:checked + .toggle-slider::after { transform: translateX(18px); }
+        .plan-banner { background: linear-gradient(135deg, var(--primary) 0%, var(--primary-hover) 100%); border-radius: var(--radius-card); padding: 1.5rem 2rem; color: white; display: flex; align-items: center; gap: 1.5rem; margin-bottom: 1.5rem; }
+        .plan-icon { font-size: 2.5rem; }
+        .plan-info { flex: 1; }
+        .plan-name { font-size: 1.2rem; font-weight: bold; }
+        .plan-desc { font-size: 0.88rem; opacity: 0.85; margin-top: 0.25rem; }
+        .plan-badge { background: rgba(255,255,255,0.2); padding: 0.3rem 0.9rem; border-radius: 20px; font-size: 0.82rem; font-weight: bold; align-self: flex-start; }
+        .billing-row { display: flex; justify-content: space-between; align-items: center; padding: 0.85rem 0; border-bottom: 1px solid var(--border-light); font-size: 0.9rem; }
+        .billing-row:last-child { border-bottom: none; }
+        .billing-label { color: var(--text-muted); }
+        .billing-value { font-weight: bold; color: var(--text-main); }
+        .danger-card { border: 1.5px solid #fca5a5; }
+        .danger-card h2 { color: #c0392b; }
+        .danger-action { display: flex; justify-content: space-between; align-items: center; padding: 1.1rem 0; border-bottom: 1px solid #fee2e2; }
+        .danger-action:last-child { border-bottom: none; padding-bottom: 0; }
+        .danger-action:first-child { padding-top: 0; }
+        .danger-action-info .title { font-weight: bold; font-size: 0.9rem; color: var(--text-main); }
+        .danger-action-info .desc  { font-size: 0.82rem; color: var(--text-muted); margin-top: 0.15rem; }
+        .btn-danger { background: #fff3f3; color: #c0392b; border: 1.5px solid #e74c3c; padding: 0.5rem 1rem; border-radius: var(--radius-btn); font-weight: bold; font-size: 0.85rem; cursor: pointer; white-space: nowrap; transition: all 0.2s; }
+        .btn-danger:hover { background: #e74c3c; color: white; }
+        .toast { position: fixed; bottom: 2rem; right: 2rem; background: var(--text-main); color: white; padding: 0.9rem 1.5rem; border-radius: var(--radius-btn); font-size: 0.9rem; font-weight: bold; opacity: 0; transform: translateY(10px); transition: all 0.3s; pointer-events: none; z-index: 9999; }
+        .toast.show { opacity: 1; transform: translateY(0); }
+        .toast.success { background: var(--success); }
+        .toast.error   { background: #e74c3c; }
+        .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.45); z-index: 1000; align-items: center; justify-content: center; }
+        .modal-overlay.open { display: flex; }
+        .modal { background: white; border-radius: var(--radius-card); padding: 2rem; width: 100%; max-width: 440px; box-shadow: 0 16px 48px rgba(0,0,0,0.2); }
+        .modal h3 { font-size: 1.15rem; margin-bottom: 0.5rem; }
+        .modal p  { font-size: 0.9rem; color: var(--text-muted); margin-bottom: 1.5rem; line-height: 1.6; }
+        .modal-actions { display: flex; justify-content: flex-end; gap: 0.75rem; }
+        .filter-label { display: block; font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.5px; font-weight: bold; color: var(--text-muted); margin-bottom: 0.5rem; }
+        @media (max-width: 700px) { .settings-container { grid-template-columns: 1fr; } .settings-nav { flex-direction: row; flex-wrap: wrap; } .form-row { grid-template-columns: 1fr; } .color-swatch-grid { grid-template-columns: repeat(6, 36px); } }
+    </style>
+</head>
+<body>
+    <header>
+        <a href="e_dashboard.html" class="header-logo-link" id="logo-link">
+            <div class="itmp-logo-placeholder"><img src="../../assests/images/ITMP.png" style="max-width: 100px;"></div>
+        </a>
+        <div class="header-search" style="display:none;"></div>
+        <div class="header-nav">
+            <a href="e_dashboard.html">Dashboard</a>
+            <a href="e_edit_profile.html">Company Profile</a>
+            <a href="#" onclick="DataService.logout();return false;">Sign Out</a>
+        </div>
+    </header>
+
+    <main class="settings-main dashboard-main">
+        <div style="width:100%;max-width:1000px;margin:0 auto;">
+            <a href="e_edit_profile.html" class="back-link">← Back to Profile</a>
+        </div>
+
+        <div class="settings-container">
+            <nav>
+                <div class="settings-nav" id="settings-nav">
+                    <button class="settings-nav-item active" onclick="showSection('account')"><span class="nav-icon">🏢</span> Company</button>
+                    <button class="settings-nav-item" onclick="showSection('avatar')"><span class="nav-icon">🎨</span> Logo / Avatar</button>
+                    <div class="nav-divider"></div>
+                    <button class="settings-nav-item" onclick="showSection('membership')"><span class="nav-icon">⭐</span> Membership</button>
+                    <button class="settings-nav-item" onclick="showSection('billing')"><span class="nav-icon">💳</span> Billing</button>
+                    <div class="nav-divider"></div>
+                    <button class="settings-nav-item" onclick="showSection('notifications')"><span class="nav-icon">🔔</span> Notifications</button>
+                    <button class="settings-nav-item" onclick="showSection('privacy')"><span class="nav-icon">🔒</span> Privacy</button>
+                    <div class="nav-divider"></div>
+                    <button class="settings-nav-item nav-danger" onclick="showSection('danger')"><span class="nav-icon">⚠️</span> Danger Zone</button>
+                </div>
+            </nav>
+
+            <div class="settings-panel">
+
+                <!-- COMPANY ACCOUNT -->
+                <section class="settings-section active" id="sec-account">
+                    <div class="settings-card card">
+                        <h2>🏢 Company Details</h2>
+                        <p class="card-subtitle">Update your company information and contact details.</p>
+                        <div class="form-row">
+                            <div class="form-group"><label>Company Name</label><input type="text" id="acc-company"></div>
+                            <div class="form-group"><label>Industry</label><input type="text" id="acc-industry" placeholder="e.g. Software / SaaS"></div>
+                        </div>
+                        <div class="form-group"><label>Description</label><textarea id="acc-desc" rows="4" placeholder="Tell candidates about your company…"></textarea></div>
+                        <div class="form-row">
+                            <div class="form-group"><label>Location</label><input type="text" id="acc-location" placeholder="e.g. Sydney, NSW"></div>
+                            <div class="form-group"><label>Website</label><input type="text" id="acc-website" placeholder="https://example.com"></div>
+                        </div>
+                        <div class="form-group"><label>ABN</label><input type="text" id="acc-abn" placeholder="e.g. 12 345 678 901"></div>
+                        <div class="settings-actions">
+                            <button class="btn-cancel-action" onclick="loadAccountForm()">Discard</button>
+                            <button class="btn-save" onclick="saveAccount()">Save Changes</button>
+                        </div>
+                    </div>
+
+                    <div class="settings-card card">
+                        <h2>📬 Contact Details</h2>
+                        <p class="card-subtitle">Contact info for candidates and ITMP communications.</p>
+                        <div class="form-row">
+                            <div class="form-group"><label>Email</label><input type="email" id="acc-email"></div>
+                            <div class="form-group"><label>Phone</label><input type="text" id="acc-phone"></div>
+                        </div>
+                        <div class="settings-actions">
+                            <button class="btn-save" onclick="saveContact()">Save Contact Info</button>
+                        </div>
+                    </div>
+
+                    <div class="settings-card card">
+                        <h2>🔑 Change Password</h2>
+                        <p class="card-subtitle">Choose a strong, unique password for your account.</p>
+                        <div class="form-group"><label>Current Password</label><input type="password" id="pw-current" placeholder="••••••••"></div>
+                        <div class="form-row">
+                            <div class="form-group"><label>New Password</label><input type="password" id="pw-new" placeholder="••••••••"></div>
+                            <div class="form-group"><label>Confirm New Password</label><input type="password" id="pw-confirm" placeholder="••••••••"></div>
+                        </div>
+                        <div class="settings-actions">
+                            <button class="btn-save" onclick="changePassword()">Update Password</button>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- AVATAR -->
+                <section class="settings-section" id="sec-avatar">
+                    <div class="settings-card card">
+                        <h2>🎨 Company Logo / Avatar</h2>
+                        <p class="card-subtitle">ITMP uses your company initials as your avatar. Choose a colour that represents your brand.</p>
+                        <div class="avatar-preview-row">
+                            <div class="avatar-preview-large" id="avatar-preview">AT</div>
+                            <div class="avatar-desc">Your company avatar displays your initials on your profile, job listings, and in candidate search results.<br><br><strong>Initials</strong> are set automatically from your company name.</div>
+                        </div>
+                        <label class="filter-label" style="margin-bottom:0.75rem;">Choose a colour</label>
+                        <div class="color-swatch-grid" id="color-swatches"></div>
+                        <div class="settings-actions">
+                            <button class="btn-save" onclick="saveAvatar()">Save Avatar</button>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- MEMBERSHIP -->
+                <section class="settings-section" id="sec-membership">
+                    <div class="settings-card card">
+                        <h2>⭐ Membership Plan</h2>
+                        <p class="card-subtitle">Manage your ITMP employer subscription.</p>
+                        <div class="plan-banner" id="plan-banner">
+                            <div class="plan-icon">⭐</div>
+                            <div class="plan-info">
+                                <div class="plan-name" id="plan-name">Premium Employer</div>
+                                <div class="plan-desc" id="plan-desc">Unlimited job postings, priority candidate matching, and featured listings included.</div>
+                            </div>
+                            <div class="plan-badge" id="plan-badge">Active</div>
+                        </div>
+                        <div id="plan-features">
+                            <div class="toggle-row"><div class="toggle-info"><div class="toggle-title">Unlimited Job Postings</div><div class="toggle-desc">Post as many roles as you need with no monthly cap.</div></div><span style="color:var(--success);font-weight:bold;">✔ Included</span></div>
+                            <div class="toggle-row"><div class="toggle-info"><div class="toggle-title">Priority AI Matching</div><div class="toggle-desc">Your jobs are surfaced first to relevant candidates.</div></div><span style="color:var(--success);font-weight:bold;">✔ Included</span></div>
+                            <div class="toggle-row"><div class="toggle-info"><div class="toggle-title">Advanced Candidate Analytics</div><div class="toggle-desc">See who viewed and applied to your listings.</div></div><span style="color:var(--success);font-weight:bold;">✔ Included</span></div>
+                        </div>
+                        <div class="settings-actions" id="membership-actions">
+                            <button class="btn-danger" onclick="openModal('cancel-modal')">Cancel Membership</button>
+                        </div>
+                    </div>
+                    <div class="settings-card card" id="upgrade-cta" style="display:none;">
+                        <h2>🚀 Upgrade to Premium</h2>
+                        <p class="card-subtitle">Unlock unlimited job postings, AI-powered matching, and priority visibility to candidates.</p>
+                        <button class="btn-save" style="width:100%;padding:0.85rem;">Upgrade — $49.99/month</button>
+                    </div>
+                </section>
+
+                <!-- BILLING -->
+                <section class="settings-section" id="sec-billing">
+                    <div class="settings-card card">
+                        <h2>💳 Billing Information</h2>
+                        <p class="card-subtitle">Manage your payment method and view past invoices.</p>
+                        <label class="filter-label" style="margin-bottom:0.75rem;">Payment Method</label>
+                        <div style="display:flex;align-items:center;gap:1rem;padding:1rem 1.25rem;border:1.5px solid var(--border-light);border-radius:var(--radius-card);background:var(--bg-main);margin-bottom:1.5rem;">
+                            <div style="font-size:1.8rem;">💳</div>
+                            <div style="flex:1;"><div style="font-weight:bold;color:var(--text-main);">Visa ending in 4242</div><div style="font-size:0.82rem;color:var(--text-muted);">Expires 08/2028</div></div>
+                        </div>
+                        <div class="form-group"><label>Card Number</label><input type="text" placeholder="•••• •••• •••• ••••" maxlength="19" id="cc-number"></div>
+                        <div class="form-row">
+                            <div class="form-group"><label>Expiry</label><input type="text" placeholder="MM / YY" id="cc-expiry"></div>
+                            <div class="form-group"><label>CVC</label><input type="text" placeholder="•••" maxlength="4" id="cc-cvc"></div>
+                        </div>
+                        <div class="form-group"><label>Name on Card</label><input type="text" id="cc-name"></div>
+                        <div class="settings-actions"><button class="btn-save" onclick="saveCard()">Save Payment Method</button></div>
+                    </div>
+                </section>
+
+                <!-- NOTIFICATIONS -->
+                <section class="settings-section" id="sec-notifications">
+                    <div class="settings-card card">
+                        <h2>🔔 Email Notifications</h2>
+                        <p class="card-subtitle">Control which emails ITMP sends you.</p>
+                        <div class="toggle-row"><div class="toggle-info"><div class="toggle-title">New Applicants</div><div class="toggle-desc">Get emailed when someone applies to your job listings.</div></div><label class="toggle-switch"><input type="checkbox" checked id="notif-applicants"><span class="toggle-slider"></span></label></div>
+                        <div class="toggle-row"><div class="toggle-info"><div class="toggle-title">Candidate Recommendations</div><div class="toggle-desc">Weekly digest of candidates matching your open roles.</div></div><label class="toggle-switch"><input type="checkbox" checked id="notif-matches"><span class="toggle-slider"></span></label></div>
+                        <div class="toggle-row"><div class="toggle-info"><div class="toggle-title">Product Updates &amp; Tips</div><div class="toggle-desc">Platform announcements and hiring tips from ITMP.</div></div><label class="toggle-switch"><input type="checkbox" checked id="notif-product"><span class="toggle-slider"></span></label></div>
+                        <div class="toggle-row"><div class="toggle-info"><div class="toggle-title">Marketing Emails</div><div class="toggle-desc">Promotions and featured candidate spotlights.</div></div><label class="toggle-switch"><input type="checkbox" id="notif-marketing"><span class="toggle-slider"></span></label></div>
+                        <div class="settings-actions"><button class="btn-save" onclick="showToast('Notification preferences saved!','success')">Save Preferences</button></div>
+                    </div>
+                </section>
+
+                <!-- PRIVACY -->
+                <section class="settings-section" id="sec-privacy">
+                    <div class="settings-card card">
+                        <h2>🔒 Privacy Settings</h2>
+                        <p class="card-subtitle">Control how your company appears on ITMP.</p>
+                        <div class="toggle-row"><div class="toggle-info"><div class="toggle-title">Company Profile Visible</div><div class="toggle-desc">Candidates can discover your company in employer search results.</div></div><label class="toggle-switch"><input type="checkbox" checked id="priv-visible"><span class="toggle-slider"></span></label></div>
+                        <div class="toggle-row"><div class="toggle-info"><div class="toggle-title">Show Contact Details</div><div class="toggle-desc">Candidates can see your company email and phone on your profile.</div></div><label class="toggle-switch"><input type="checkbox" id="priv-contact"><span class="toggle-slider"></span></label></div>
+                        <div class="toggle-row"><div class="toggle-info"><div class="toggle-title">Allow Profile Analytics</div><div class="toggle-desc">Let ITMP collect anonymised data to improve your candidate matching.</div></div><label class="toggle-switch"><input type="checkbox" checked id="priv-analytics"><span class="toggle-slider"></span></label></div>
+                        <div class="settings-actions"><button class="btn-save" onclick="savePrivacy()">Save Privacy Settings</button></div>
+                    </div>
+                </section>
+
+                <!-- DANGER ZONE -->
+                <section class="settings-section" id="sec-danger">
+                    <div class="settings-card card danger-card">
+                        <h2>⚠️ Danger Zone</h2>
+                        <p class="card-subtitle">These actions are permanent and cannot be undone.</p>
+                        <div class="danger-action"><div class="danger-action-info"><div class="title">Download My Data</div><div class="desc">Export all your ITMP data as a JSON file (company profile, postings, applications).</div></div><button class="btn-danger" onclick="downloadMyData()">Download Data</button></div>
+                        <div class="danger-action"><div class="danger-action-info"><div class="title">Delete All Job Postings</div><div class="desc">Permanently remove all your job listings and their applicant data. This cannot be undone.</div></div><button class="btn-danger" onclick="openModal('delete-jobs-modal')">Delete All Postings</button></div>
+                        <div class="danger-action"><div class="danger-action-info"><div class="title">Delete Account</div><div class="desc">Permanently delete your employer account and all associated data. This action cannot be reversed.</div></div><button class="btn-danger" style="background:#e74c3c;color:white;" onclick="openModal('delete-account-modal')">Delete Account</button></div>
+                    </div>
+                </section>
+
+            </div>
+        </div>
+    </main>
+
+    <!-- Cancel Membership Modal -->
+    <div class="modal-overlay" id="cancel-modal">
+        <div class="modal">
+            <h3>Cancel Premium Membership</h3>
+            <p>Are you sure you want to cancel? Your Premium benefits will remain active until the end of your current billing period on <strong>30 June 2026</strong>.</p>
+            <div class="modal-actions">
+                <button class="btn-cancel-action" onclick="closeModal('cancel-modal')">Keep Premium</button>
+                <button class="btn-danger" onclick="cancelMembership()">Yes, Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Delete Postings Modal -->
+    <div class="modal-overlay" id="delete-jobs-modal">
+        <div class="modal">
+            <h3>Delete All Job Postings?</h3>
+            <p>This will permanently remove all your job listings and applicant data. This cannot be undone.</p>
+            <div class="modal-actions">
+                <button class="btn-cancel-action" onclick="closeModal('delete-jobs-modal')">Cancel</button>
+                <button class="btn-danger" style="background:#e74c3c;color:white;" onclick="closeModal('delete-jobs-modal');showToast('All postings deleted.','success')">Delete All</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Delete Account Modal -->
+    <div class="modal-overlay" id="delete-account-modal">
+        <div class="modal">
+            <h3>Delete Your Account?</h3>
+            <p>This will permanently delete your ITMP employer account, company profile, all job postings, and applicant data. <strong>This cannot be undone.</strong></p>
+            <div class="modal-actions">
+                <button class="btn-cancel-action" onclick="closeModal('delete-account-modal')">Cancel</button>
+                <button class="btn-danger" style="background:#e74c3c;color:white;" onclick="deleteAccount()">Delete My Account</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="toast" id="toast"></div>
+
+    <script src="../../assests/js/data.js"></script>
+    <script>
+        const AVATAR_COLORS = [
+            '#1a56db','#1e40af','#7e3af2','#5521b5','#0e9f6e','#057a55',
+            '#c81e1e','#9b1c1c','#e3a008','#b45309','#0891b2','#0e7490',
+            '#6b7280','#374151','#f59e0b','#0284c7'
+        ];
+        let _selectedColor = '#1a56db';
+
+        function buildColorSwatches() {
+            const grid = document.getElementById('color-swatches');
+            const user = DataService.getCurrentUser();
+            _selectedColor = user?.avatar_color || '#1a56db';
+            grid.innerHTML = AVATAR_COLORS.map(c => `
+                <div class="color-swatch ${c === _selectedColor ? 'selected' : ''}" style="background:${c};" onclick="selectColor('${c}')" title="${c}"></div>
+            `).join('');
+            updateAvatarPreview();
+        }
+        function selectColor(c) {
+            _selectedColor = c;
+            document.querySelectorAll('.color-swatch').forEach(s => s.classList.toggle('selected', s.style.background === c || s.style.backgroundColor === c));
+            updateAvatarPreview();
+        }
+        function updateAvatarPreview() {
+            const user = DataService.getCurrentUser();
+            const preview = document.getElementById('avatar-preview');
+            if (preview) { preview.textContent = user?.avatar_initials || 'AT'; preview.style.background = _selectedColor; }
+        }
+        function saveAvatar() { DataService.updateAvatar(_selectedColor); showToast('Avatar colour saved!', 'success'); }
+
+        const SECTION_IDS = ['account','avatar','membership','billing','notifications','privacy','danger'];
+        function showSection(id) {
+            document.querySelectorAll('.settings-section').forEach(s => s.classList.remove('active'));
+            document.querySelectorAll('.settings-nav-item').forEach(b => b.classList.remove('active'));
+            document.getElementById(`sec-${id}`).classList.add('active');
+            const idx = SECTION_IDS.indexOf(id);
+            document.querySelectorAll('.settings-nav-item')[idx]?.classList.add('active');
+            if (id === 'avatar')     buildColorSwatches();
+            if (id === 'membership') renderMembership();
+        }
+
+        function loadAccountForm() {
+            DataService.onReady(() => {
+                const u = DataService.getCurrentUser();
+                if (!u) return;
+                document.getElementById('acc-company').value  = u.company_name || u.full_name || '';
+                document.getElementById('acc-industry').value = u.industry || '';
+                document.getElementById('acc-desc').value     = u.description || u.bio || '';
+                document.getElementById('acc-location').value = u.location || '';
+                document.getElementById('acc-website').value  = u.website || '';
+                document.getElementById('acc-abn').value      = u.abn || '';
+                document.getElementById('acc-email').value    = u.email || '';
+                document.getElementById('acc-phone').value    = u.phone || '';
+            });
+        }
+
+        function saveAccount() {
+            const name = document.getElementById('acc-company').value.trim();
+            const initials = name.split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2);
+            DataService.updateProfile({
+                company_name: name,
+                industry:     document.getElementById('acc-industry').value.trim(),
+                description:  document.getElementById('acc-desc').value.trim(),
+                location:     document.getElementById('acc-location').value.trim(),
+                website:      document.getElementById('acc-website').value.trim(),
+                abn:          document.getElementById('acc-abn').value.trim(),
+                avatar_initials: initials,
+            });
+            showToast('Company details saved!', 'success');
+        }
+
+        function saveContact() {
+            DataService.updateProfile({ phone: document.getElementById('acc-phone').value.trim() });
+            showToast('Contact info saved!', 'success');
+        }
+
+        function changePassword() {
+            const curr = document.getElementById('pw-current').value;
+            const nw   = document.getElementById('pw-new').value;
+            const conf = document.getElementById('pw-confirm').value;
+            if (!curr || !nw || !conf) { showToast('Please fill in all password fields.', 'error'); return; }
+            if (nw !== conf)            { showToast('New passwords do not match.', 'error'); return; }
+            if (nw.length < 8)          { showToast('Password must be at least 8 characters.', 'error'); return; }
+            ['pw-current','pw-new','pw-confirm'].forEach(id => document.getElementById(id).value = '');
+            showToast('Password updated successfully!', 'success');
+        }
+
+        function renderMembership() {
+            const u = DataService.getCurrentUser();
+            const isPremium = u?.is_premium ?? false;
+            document.getElementById('upgrade-cta').style.display        = isPremium ? 'none' : 'block';
+            document.getElementById('membership-actions').style.display = isPremium ? '' : 'none';
+            if (!isPremium) {
+                document.getElementById('plan-name').textContent = 'Free Plan';
+                document.getElementById('plan-desc').textContent = 'Upgrade to Premium to unlock unlimited postings and priority matching.';
+                document.getElementById('plan-badge').textContent = 'Free';
+                document.getElementById('plan-banner').style.background = 'linear-gradient(135deg,#6b7280,#374151)';
+            }
+        }
+        function cancelMembership() {
+            const u = DataService.getCurrentUser(); if (u) u.is_premium = false;
+            closeModal('cancel-modal'); renderMembership();
+            showToast('Membership cancelled. Benefits active until 30 June 2026.', 'success');
+        }
+        function saveCard() {
+            const num = document.getElementById('cc-number').value.replace(/\s/g,'');
+            if (num.length < 15) { showToast('Please enter a valid card number.', 'error'); return; }
+            showToast('Payment method updated!', 'success');
+            ['cc-number','cc-expiry','cc-cvc','cc-name'].forEach(id => document.getElementById(id).value = '');
+        }
+
+        const PRIVACY_KEY = 'itmp_employer_privacy';
+        function loadPrivacy() {
+            try {
+                const saved = JSON.parse(localStorage.getItem(PRIVACY_KEY) || 'null');
+                if (!saved) return;
+                ['priv-visible','priv-contact','priv-analytics'].forEach(id => {
+                    const el = document.getElementById(id);
+                    if (el && id in saved) el.checked = saved[id];
+                });
+            } catch (e) {}
+        }
+        function savePrivacy() {
+            const prefs = {};
+            ['priv-visible','priv-contact','priv-analytics'].forEach(id => {
+                const el = document.getElementById(id); if (el) prefs[id] = el.checked;
+            });
+            try { localStorage.setItem(PRIVACY_KEY, JSON.stringify(prefs)); } catch (e) {}
+            showToast('Privacy settings saved!', 'success');
+        }
+
+        function downloadMyData() {
+            const u = DataService.getCurrentUser(); if (!u) return;
+            const blob = new Blob([JSON.stringify(u, null, 2)], { type: 'application/json' });
+            const url  = URL.createObjectURL(blob);
+            Object.assign(document.createElement('a'), { href: url, download: 'itmp_company_data.json' }).click();
+            URL.revokeObjectURL(url);
+            showToast('Data downloaded!', 'success');
+        }
+        function deleteAccount() {
+            closeModal('delete-account-modal');
+            showToast('Account deleted. Redirecting…', 'success');
+            setTimeout(() => window.location.href = '/pages/login.html', 1800);
+        }
+
+        function openModal(id)  { document.getElementById(id).classList.add('open'); }
+        function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+        document.querySelectorAll('.modal-overlay').forEach(m =>
+            m.addEventListener('click', e => { if (e.target === m) m.classList.remove('open'); })
+        );
+
+        let _toastTimer = null;
+        function showToast(msg, type = '') {
+            const t = document.getElementById('toast');
+            t.textContent = msg; t.className = `toast ${type} show`;
+            clearTimeout(_toastTimer);
+            _toastTimer = setTimeout(() => t.classList.remove('show'), 3200);
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            loadPrivacy();
+            DataService.onReady(() => {
+                loadAccountForm();
+                const hash = window.location.hash.replace('#','');
+                if (hash) showSection(hash);
+            });
+        });
+    </script>
+</body>
+</html>

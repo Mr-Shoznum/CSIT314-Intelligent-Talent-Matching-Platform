@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Applications – ITMP</title>
+    <link rel="stylesheet" href="../../assests/styling/global.css">
+    <link rel="stylesheet" href="../../assests/styling/dashboard.css">
+    <link rel="icon" type="image/x-icon" href="../../assests/images/ITMP-icon-logo.ico">
+    <style>
+        .apps-main { padding: 2rem; flex-direction: column; align-items: center; justify-content: flex-start; }
+        .apps-wrapper { width: 100%; max-width: 900px; }
+        .back-link { display: block; color: var(--primary); font-weight: bold; font-size: 0.9rem; text-decoration: none; margin-bottom: 1rem; }
+        .back-link:hover { text-decoration: underline; }
+        .apps-hero { padding: 1.75rem 2rem; background: linear-gradient(135deg,#ffffff 0%, var(--bg-light-hover) 100%); border-left: 5px solid var(--primary); margin-bottom: 1.5rem; }
+        .apps-hero h1 { font-size: 1.5rem; color: var(--text-main); margin-bottom: 0.3rem; text-align: left; }
+        .apps-hero p { color: var(--text-muted); font-size: 0.9rem; }
+        .filter-bar { display: flex; gap: 0.5rem; margin-bottom: 1.25rem; flex-wrap: wrap; }
+        .filter-chip { padding: 0.35rem 1rem; border-radius: 20px; border: 1.5px solid var(--border-color); background: none; color: var(--text-muted); font-size: 0.85rem; font-weight: bold; cursor: pointer; transition: all 0.15s; }
+        .filter-chip.active { border-color: var(--primary); color: var(--primary); background: #e8f0ff; }
+        .app-card { padding: 1.5rem; margin-bottom: 0; }
+        .app-top { display: flex; gap: 1rem; align-items: flex-start; }
+        .app-badge { width: 48px; height: 48px; border-radius: 10px; background: var(--primary); color: white; font-weight: bold; font-size: 1rem; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+        .app-info { flex: 1; }
+        .app-title { font-size: 1.05rem; font-weight: bold; color: var(--primary); text-decoration: none; }
+        .app-title:hover { text-decoration: underline; }
+        .app-company { font-size: 0.9rem; color: var(--text-muted); font-weight: bold; margin: 0.15rem 0; }
+        .app-meta { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 0.4rem; }
+        .meta-tag { font-size: 0.8rem; background: var(--bg-light-hover); padding: 0.25rem 0.65rem; border-radius: 20px; color: var(--text-muted); font-weight: bold; }
+        .status-badge { padding: 0.3rem 0.85rem; border-radius: 20px; font-size: 0.8rem; font-weight: bold; white-space: nowrap; align-self: flex-start; }
+        .status-pending  { background: #fff8e6; color: #b08000; border: 1px solid #f0c040; }
+        .status-review   { background: #e8f0ff; color: var(--primary); border: 1px solid var(--primary); }
+        .status-interview{ background: #e6ffe6; color: var(--success); border: 1px solid var(--success); }
+        .status-rejected { background: #fff3f3; color: #c0392b; border: 1px solid #e74c3c; }
+        .status-offered  { background: #e6ffe6; color: var(--success); border: 1px solid var(--success); font-size: 0.85rem; }
+        .app-actions { display: flex; gap: 0.75rem; align-items: center; margin-top: 1rem; padding-top: 1rem; border-top: 1px solid var(--border-light); }
+        .app-date { font-size: 0.8rem; color: var(--text-muted); margin-left: auto; }
+        .empty-state { text-align: center; padding: 4rem 2rem; color: var(--text-muted); }
+        .empty-state .empty-icon { font-size: 3rem; margin-bottom: 1rem; }
+        .apps-list { display: flex; flex-direction: column; gap: 1rem; }
+        .summary-bar { display: grid; grid-template-columns: repeat(4,1fr); gap: 1rem; margin-bottom: 1.5rem; }
+        .summary-stat { background: white; border: 1.5px solid var(--border-light); border-radius: var(--radius-card); padding: 1rem; text-align: center; }
+        .summary-stat .s-num  { font-size: 1.6rem; font-weight: bold; color: var(--primary); }
+        .summary-stat .s-label{ font-size: 0.8rem; color: var(--text-muted); margin-top: 0.2rem; }
+    </style>
+</head>
+<body>
+    <header>
+        <a href="c_dashboard.html" class="header-logo-link">
+            <div class="itmp-logo-placeholder"><img src="../../assests/images/ITMP.png" style="max-width: 100px;"></div>
+        </a>
+        <div class="header-search">
+            <input type="text" placeholder="Search for jobs..." class="quick-search-input" id="header-search">
+            <button class="btn-search-small"
+                onclick="window.location.href='c_search_result.html?q='+encodeURIComponent(document.getElementById('header-search').value)">Search</button>
+        </div>
+        <div class="header-nav">
+            <a href="c_dashboard.html">Dashboard</a>
+            <a href="c_search_result.html">Browse Jobs</a>
+            <a href="c_settings.html">Settings</a>
+            <a href="#" onclick="DataService.logout();return false;">Sign Out</a>
+        </div>
+    </header>
+
+    <main class="apps-main dashboard-main">
+        <div class="apps-wrapper">
+            <a href="c_dashboard.html" class="back-link">← Back to Dashboard</a>
+
+            <div class="card apps-hero">
+                <h1>📋 My Applications</h1>
+                <p>Track all the jobs you've applied to in one place.</p>
+            </div>
+
+            <div class="summary-bar" id="summary-bar">
+                <div class="summary-stat"><div class="s-num" id="stat-total">0</div><div class="s-label">Total</div></div>
+                <div class="summary-stat"><div class="s-num" id="stat-pending" style="color:#b08000;">0</div><div class="s-label">Pending</div></div>
+                <div class="summary-stat"><div class="s-num" id="stat-interview" style="color:var(--success);">0</div><div class="s-label">Interview</div></div>
+                <div class="summary-stat"><div class="s-num" id="stat-rejected" style="color:#c0392b;">0</div><div class="s-label">Rejected</div></div>
+            </div>
+
+            <div class="filter-bar">
+                <button class="filter-chip active" onclick="setFilter('all', this)">All</button>
+                <button class="filter-chip" onclick="setFilter('pending', this)">Pending</button>
+                <button class="filter-chip" onclick="setFilter('review', this)">Under Review</button>
+                <button class="filter-chip" onclick="setFilter('interview', this)">Interview</button>
+                <button class="filter-chip" onclick="setFilter('offered', this)">Offered</button>
+                <button class="filter-chip" onclick="setFilter('rejected', this)">Rejected</button>
+            </div>
+
+            <div class="apps-list" id="apps-list"></div>
+
+            <div class="empty-state" id="empty-state" style="display:none;">
+                <div class="empty-icon">📭</div>
+                <p>No applications here yet.</p>
+                <a href="c_search_result.html" class="btn-primary" style="display:inline-block;margin-top:1rem;text-decoration:none;">Browse Jobs</a>
+            </div>
+        </div>
+    </main>
+
+    <footer class="minimal-footer">
+        <div class="footer-links"><a href="#">Terms of Service</a><a href="#">Privacy Policy</a><a href="#">Candidate Terms</a></div>
+        <div class="footer-copyright">&copy; 2026 ITMP. All rights reserved.</div>
+    </footer>
+
+    <script src="../../assests/js/data.js"></script>
+    <script>
+        let _allApplied = [];
+        let _filter     = 'all';
+
+        const STATUS_LABEL = { pending: 'Pending', review: 'Under Review', interview: 'Interview Scheduled', offered: 'Offer Received', rejected: 'Not Selected' };
+        const STATUS_CLASS = { pending: 'status-pending', review: 'status-review', interview: 'status-interview', offered: 'status-offered', rejected: 'status-rejected' };
+
+        function setFilter(f, btn) {
+            _filter = f;
+            document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
+            btn.classList.add('active');
+            renderList();
+        }
+
+        function renderList() {
+            const list  = document.getElementById('apps-list');
+            const empty = document.getElementById('empty-state');
+            const items = _filter === 'all' ? _allApplied : _allApplied.filter(j => (j._status || 'pending') === _filter);
+
+            if (!items.length) { list.innerHTML = ''; empty.style.display = 'block'; return; }
+            empty.style.display = 'none';
+
+            list.innerHTML = items.map(job => {
+                const status     = job._status || 'pending';
+                const statusCls  = STATUS_CLASS[status]  || 'status-pending';
+                const statusLbl  = STATUS_LABEL[status]  || 'Pending';
+                const appliedAt  = job._applied_at ? new Date(job._applied_at).toLocaleDateString() : 'Recently';
+                return `
+                <div class="card app-card">
+                    <div class="app-top">
+                        <div class="app-badge">${job.company_initials || job.company?.slice(0,2).toUpperCase() || '?'}</div>
+                        <div class="app-info">
+                            <a href="c_view_job.html?id=${job.id}" class="app-title">${job.title}</a>
+                            <div class="app-company">${job.company}</div>
+                            <div class="app-meta">
+                                <span class="meta-tag">📍 ${job.location}</span>
+                                <span class="meta-tag">🖥️ ${job.work_mode}</span>
+                                <span class="meta-tag">💰 ${job.salary_display}</span>
+                            </div>
+                        </div>
+                        <span class="status-badge ${statusCls}">${statusLbl}</span>
+                    </div>
+                    <div class="app-actions">
+                        <a href="c_view_job.html?id=${job.id}" class="btn-secondary btn-sm" style="text-decoration:none;">View Listing</a>
+                        <a href="c_view_employer.html?id=${job.employer_id}" class="btn-text" style="text-decoration:none;">View Employer</a>
+                        <span class="app-date">Applied ${appliedAt}</span>
+                    </div>
+                </div>`;
+            }).join('');
+        }
+
+        function renderSummary(jobs) {
+            const counts = { pending: 0, review: 0, interview: 0, offered: 0, rejected: 0 };
+            jobs.forEach(j => { const s = j._status || 'pending'; if (s in counts) counts[s]++; });
+            document.getElementById('stat-total').textContent     = jobs.length;
+            document.getElementById('stat-pending').textContent   = counts.pending + counts.review;
+            document.getElementById('stat-interview').textContent = counts.interview + counts.offered;
+            document.getElementById('stat-rejected').textContent  = counts.rejected;
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            DataService.onReady(() => {
+                _allApplied = DataService.getAppliedJobs().map(j => ({ ...j, _status: j.status || 'pending', _applied_at: j.applied_at }));
+                renderSummary(_allApplied);
+                renderList();
+            });
+        });
+    </script>
+</body>
+</html>

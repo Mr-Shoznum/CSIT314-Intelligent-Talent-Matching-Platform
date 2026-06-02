@@ -149,7 +149,7 @@
 <body>
 
     <header>
-        <a href="/" class="header-logo-link">
+        <a href="c_dashboard.html" class="header-logo-link">
             <div class="itmp-logo-placeholder">
                 <img src="../../assests/images/ITMP.png" style="max-width: 100px;">
             </div>
@@ -157,11 +157,11 @@
         </a>
         <div class="header-search">
             <input type="text" placeholder="Search for jobs..." class="quick-search-input" id="header-search">
-            <button class="btn-search-small" onclick="window.location.href='search_result.html?q='+encodeURIComponent(document.getElementById('header-search').value)">Search</button>
+            <button class="btn-search-small" onclick="window.location.href='c_search_result.html?q='+encodeURIComponent(document.getElementById('header-search').value)">Search</button>
         </div>
         <div class="header-nav">
             <a href="c_dashboard.html">Dashboard</a>
-            <a href="search_result.html">Browse Jobs</a>
+            <a href="c_search_result.html">Browse Jobs</a>
             <a href="#" onclick="DataService.logout();return false;">Sign Out</a>
         </div>
     </header>
@@ -187,8 +187,8 @@
                 </div>
                 <div class="hero-actions">
                     <button class="btn-primary btn-sm" onclick="openEditModal()">✏️ Edit Profile</button>
-                    <a href="settings.html" class="btn-settings-link">⚙️ Settings</a>
-                    <a href="settings.html#resume" class="btn-settings-link">📄 Update Resume</a>
+                    <a href="c_settings.html" class="btn-settings-link">⚙️ Settings</a>
+                    <a href="c_settings.html#resume" class="btn-settings-link">📄 Update Resume</a>
                 </div>
             </div>
 
@@ -219,7 +219,7 @@
             <!-- Resume -->
             <div class="card profile-section-card">
                 <h2>📄 Resume / CV
-                    <a href="settings.html#resume" class="section-edit-link">Update in Settings →</a>
+                    <a href="c_settings.html#resume" class="section-edit-link">Update in Settings →</a>
                 </h2>
                 <div id="resume-section-content">
                     <!-- injected by JS -->
@@ -229,7 +229,7 @@
             <!-- Contact Details -->
             <div class="card profile-section-card">
                 <h2>📬 Contact & Links
-                    <a href="settings.html#account" class="section-edit-link">Edit in Settings →</a>
+                    <a href="c_settings.html#account" class="section-edit-link">Edit in Settings →</a>
                 </h2>
                 <div class="contact-grid" id="pg-contact-grid"></div>
             </div>
@@ -334,38 +334,40 @@
                 if (user.open_to_work) document.getElementById('pg-open-badge').style.display = '';
 
                 // Stats
-                document.getElementById('stat-applied').textContent = user.applied_jobs.length;
-                document.getElementById('stat-saved').textContent   = user.saved_jobs.length;
-                document.getElementById('stat-views').textContent   = user.profile_views;
+                document.getElementById('stat-applied').textContent = DataService.getAppliedJobs().length;
+                document.getElementById('stat-saved').textContent   = DataService.getSavedJobs().length;
+                document.getElementById('stat-views').textContent   = user.profile_views || 0;
 
                 // Bio
                 document.getElementById('pg-bio').textContent = user.bio || 'No bio yet. Add one in Edit Profile.';
 
                 // Resume
                 const resEl = document.getElementById('resume-section-content');
-                if (user.resume_filename) {
+                const resumePath = user.resume_path || null;
+                if (resumePath) {
+                    const fname = resumePath.split('/').pop();
                     resEl.innerHTML = `
                         <div class="resume-card-inner">
                             <div class="resume-icon">📋</div>
                             <div class="resume-info">
-                                <div class="resume-filename">${user.resume_filename}</div>
-                                <div class="resume-date">Uploaded ${DataService.timeAgo(user.resume_upload_date)}</div>
+                                <div class="resume-filename">${fname}</div>
+                                <div class="resume-date">Uploaded</div>
                             </div>
-                            <a href="settings.html#resume" class="btn-secondary btn-sm" style="text-decoration:none;text-align:center;">Replace</a>
+                            <div style="display:flex;gap:0.5rem;">
+                                <a href="${resumePath}" target="_blank" class="btn-primary btn-sm" style="text-decoration:none;text-align:center;">View</a>
+                                <a href="c_settings.html#resume" class="btn-secondary btn-sm" style="text-decoration:none;text-align:center;">Replace</a>
+                            </div>
                         </div>`;
                 } else {
                     resEl.innerHTML = `
                         <p class="resume-empty-hint">No resume uploaded yet.</p>
-                        <a href="settings.html#resume" class="btn-secondary btn-sm" style="display:inline-block;margin-top:0.75rem;text-decoration:none;text-align:center;">Upload Resume →</a>`;
+                        <a href="c_settings.html#resume" class="btn-secondary btn-sm" style="display:inline-block;margin-top:0.75rem;text-decoration:none;text-align:center;">Upload Resume →</a>`;
                 }
 
                 // Contact
                 document.getElementById('pg-contact-grid').innerHTML = `
-                    <div class="contact-item"><label>Email</label><a href="mailto:${user.contact.email}">${user.contact.email || '—'}</a></div>
-                    <div class="contact-item"><label>Phone</label><span>${user.contact.phone || '—'}</span></div>
-                    <div class="contact-item"><label>LinkedIn</label><a href="https://${user.contact.linkedin}" target="_blank">${user.contact.linkedin || '—'}</a></div>
-                    <div class="contact-item"><label>GitHub</label><a href="https://${user.contact.github}" target="_blank">${user.contact.github || '—'}</a></div>
-                    ${user.contact.website ? `<div class="contact-item"><label>Website</label><a href="https://${user.contact.website}" target="_blank">${user.contact.website}</a></div>` : ''}
+                    <div class="contact-item"><label>Email</label><a href="mailto:${user.email}">${user.email || '—'}</a></div>
+                    <div class="contact-item"><label>Phone</label><span>${user.phone || '—'}</span></div>
                 `;
 
                 // Experience
@@ -403,7 +405,7 @@
                 else {
                     hList.style.display = ''; hEmpty.style.display = 'none';
                     hList.innerHTML = applied.map(j => `
-                        <a class="history-card" href="view_job.html?id=${j.id}">
+                        <a class="history-card" href="c_view_job.html?id=${j.id}">
                             <div class="history-company-badge">${j.company_initials}</div>
                             <div class="history-info">
                                 <div class="history-title">${j.title}</div>
@@ -426,7 +428,7 @@
                 else {
                     sList.style.display = ''; sEmpty.style.display = 'none';
                     sList.innerHTML = saved.map(j => `
-                        <a class="saved-item" href="view_job.html?id=${j.id}">
+                        <a class="saved-item" href="c_view_job.html?id=${j.id}">
                             <div class="saved-badge">${j.company_initials}</div>
                             <div class="saved-info">
                                 <div class="saved-title">${j.title}</div>
@@ -464,17 +466,22 @@
         function closeEditModal() { document.getElementById('edit-modal').classList.remove('open'); }
 
         function saveProfile() {
-            const name = document.getElementById('edit-name').value.trim();
+            const name   = document.getElementById('edit-name').value.trim();
+            const parts  = name.split(/\s+/);
+            const first  = parts[0] || '';
+            const last   = parts.slice(1).join(' ') || '';
             DataService.updateProfile({
-                full_name: name,
-                headline:  document.getElementById('edit-headline').value.trim(),
-                bio:       document.getElementById('edit-bio').value.trim(),
-                location:  document.getElementById('edit-location').value.trim(),
+                first_name: first,
+                last_name:  last,
+                full_name:  name,
+                headline:   document.getElementById('edit-headline').value.trim(),
+                bio:        document.getElementById('edit-bio').value.trim(),
+                location:   document.getElementById('edit-location').value.trim(),
                 work_mode_preference: document.getElementById('edit-workmode').value,
-                yoe:       +document.getElementById('edit-yoe').value,
+                yoe:        +document.getElementById('edit-yoe').value,
                 availability: document.getElementById('edit-avail').value,
-                skills:    document.getElementById('edit-skills').value.split(',').map(s=>s.trim()).filter(Boolean),
-                avatar_initials: name.split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2),
+                skills:     document.getElementById('edit-skills').value.split(',').map(s=>s.trim()).filter(Boolean),
+                avatar_initials: name.split(/\s+/).map(w=>w[0]).join('').toUpperCase().slice(0,2),
             });
             closeEditModal();
             renderProfile();

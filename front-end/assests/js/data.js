@@ -10,6 +10,7 @@ const DataService = (() => {
     let _user        = null;
     let _jobs        = [];
     let _candidates  = [];
+    let _employers   = [];
     let _myJobs      = [];
     let _appliedIds  = new Set();
     let _savedIds    = new Set();
@@ -75,14 +76,16 @@ const DataService = (() => {
         const tasks = [
             _fetch('/jobs').catch(() => []),
             _fetch('/candidates').catch(() => []),
+            _fetch('/employers').catch(() => []),
             isCandidate ? _fetch('/my/applications').catch(() => []) : Promise.resolve([]),
             isCandidate ? _fetch('/my/saved').catch(() => [])        : Promise.resolve([]),
             !isCandidate ? _fetch('/my/jobs').catch(() => [])        : Promise.resolve([]),
         ];
 
-        const [jobs, candidates, applications, savedIds, myJobs] = await Promise.all(tasks);
+        const [jobs, candidates, employers, applications, savedIds, myJobs] = await Promise.all(tasks);
 
         _candidates = candidates;
+        _employers  = employers;
         _myJobs     = myJobs;
         _appliedIds = new Set(applications.map(a => a.job_id));
         _savedIds   = new Set(savedIds);
@@ -164,6 +167,29 @@ const DataService = (() => {
         return cs;
     }
 
+    function getAllEmployers()    { return [..._employers]; }
+    function getEmployerById(id) { return _employers.find(e => e.id === Number(id)) ?? null; }
+
+    function searchEmployers(filters = {}) {
+        let es = [..._employers];
+        if (filters.query?.trim()) {
+            const q = filters.query.toLowerCase();
+            es = es.filter(e =>
+                (e.company_name||'').toLowerCase().includes(q) ||
+                (e.industry||'').toLowerCase().includes(q)     ||
+                (e.location||'').toLowerCase().includes(q)     ||
+                (e.description||'').toLowerCase().includes(q)
+            );
+        }
+        if (filters.industry) es = es.filter(e =>
+            (e.industry||'').toLowerCase().includes(filters.industry.toLowerCase())
+        );
+        if (filters.location) es = es.filter(e =>
+            (e.location||'').toLowerCase().includes(filters.location.toLowerCase())
+        );
+        return es;
+    }
+
     function getRecommendedJobs() { return _jobs.filter(j => !j.isApplied); }
     function getAppliedJobs()     { return _jobs.filter(j =>  j.isApplied); }
     function getSavedJobs()       { return _jobs.filter(j =>  j.isSaved && !j.isApplied); }
@@ -210,12 +236,35 @@ const DataService = (() => {
         }
     }
 
-    function updateResume(filename, date) {
-        if (_user) { _user.resume_filename = filename; _user.resume_upload_date = date; }
+    function updateResume(resumePath, date) {
+        if (_user) {
+            _user.resume_path = resumePath || null;
+            _user.resume_filename = resumePath ? resumePath.split('/').pop() : '';
+            _user.resume_upload_date = date;
+        }
     }
-    function deleteResume() {
-        if (_user) { _user.resume_filename = ''; _user.resume_upload_date = ''; }
+
+    async function uploadResume(file) {
+        const stored = _storedUser();
+        const headers = {};
+        if (stored?.id) headers['X-User-Id'] = String(stored.id);
+        const form = new FormData();
+        form.append('resume', file);
+        const res = await fetch(API + '/profile/resume', { method: 'POST', headers, body: form });
+        if (!res.ok) {
+            const text = await res.text().catch(() => '');
+            throw new Error(text || `HTTP ${res.status}`);
+        }
+        const updated = await res.json();
+        if (_user) _user.resume_path = updated.resume_path || null;
+        return updated;
     }
+
+    async function deleteResume() {
+        await _fetch('/profile/resume', { method: 'DELETE' });
+        if (_user) { _user.resume_path = null; _user.resume_filename = ''; _user.resume_upload_date = ''; }
+    }
+
     function updateAvatar(color) {
         if (_user) _user.avatar_color = color;
     }
@@ -250,11 +299,12 @@ const DataService = (() => {
         init, onReady,
         getCurrentUser, getCurrentEmployer, getCurrentRole, getUserById, getCandidateById,
         getAllJobs, getJobById, getJobsForCurrentUser,
-        searchJobs, searchCandidates,
+        searchJobs, searchCandidates, searchEmployers,
+        getAllEmployers, getEmployerById,
         getRecommendedJobs, getAppliedJobs, getSavedJobs,
         getPostedJobs, getApplicants, getSavedCandidates,
         applyForJob, toggleSaveJob, updateProfile, createJob,
-        updateResume, deleteResume, updateAvatar,
+        updateResume, uploadResume, deleteResume, updateAvatar,
         logout,
         getSkillsWithMatchStatus, timeAgo,
         goToJobPage, goToProfilePage,
