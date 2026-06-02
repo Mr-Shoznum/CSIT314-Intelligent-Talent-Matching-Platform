@@ -11,12 +11,13 @@
         /* ── Job detail page specific styles ──────────────────────── */
         .job-detail-main {
             padding: 2rem;
-            align-items: flex-start;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
         }
         .job-detail-container {
             width: 100%;
             max-width: 1100px;
-            margin: 0 auto;
             display: grid;
             grid-template-columns: 1fr 340px;
             gap: 2rem;
@@ -39,6 +40,22 @@
 
         /* Left col */
         .job-left-col { display: flex; flex-direction: column; gap: 1.5rem; }
+
+        /* Applicants section (employer only) */
+        .applicant-row {
+            display: flex; align-items: center; gap: 1rem;
+            padding: 0.85rem 0; border-bottom: 1px solid var(--border-light);
+        }
+        .applicant-row:last-child { border-bottom: none; }
+        .applicant-avatar {
+            width: 44px; height: 44px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-weight: bold; font-size: 1rem; color: white; flex-shrink: 0;
+        }
+        .applicant-info { flex: 1; min-width: 0; }
+        .applicant-name { font-weight: bold; color: var(--text-main); font-size: 0.95rem; }
+        .applicant-meta { font-size: 0.82rem; color: var(--text-muted); margin-top: 0.15rem; }
+        .applicant-date { font-size: 0.78rem; color: var(--text-muted); white-space: nowrap; }
 
         /* Hero */
         .job-hero-card { padding: 2rem; }
@@ -296,7 +313,7 @@
 <body>
 
     <header>
-        <a href="/" class="header-logo-link">
+        <a href="c_dashboard.html" class="header-logo-link" id="logo-link">
             <div class="itmp-logo-placeholder">
                 <img src="../../assests/images/ITMP.png" style="max-width: 100px;">
             </div>
@@ -347,6 +364,9 @@
 
         function renderJobPage() {
             DataService.onReady(() => {
+                const dash = DataService.getCurrentRole() === 'employer' ? 'e_dashboard.html' : 'c_dashboard.html';
+                document.getElementById('logo-link').href = dash;
+
                 const jobId = getJobIdFromURL();
                 const job   = DataService.getJobById(jobId);
                 const root  = document.getElementById('job-detail-root');
@@ -358,8 +378,8 @@
                 }
 
                 const user       = DataService.getCurrentUser();
-                const isApplied  = user?.applied_jobs?.includes(job.id) ?? false;
-                const isSaved    = user?.saved_jobs?.includes(job.id)   ?? false;
+                const isApplied  = job.isApplied ?? false;
+                const isSaved    = job.isSaved   ?? false;
                 const skills     = DataService.getSkillsWithMatchStatus(job);
                 const posted     = DataService.timeAgo(job.posted_date);
 
@@ -471,9 +491,17 @@
                             <ul class="job-bullet-list">${benefitsHtml}</ul>
                         </div>
 
+                        <!-- Applicants (employer only, populated by loadApplicants()) -->
+                        <div class="card job-section-card" id="applicants-section" style="display:none;">
+                            <h2>Applicants</h2>
+                            <div id="applicants-body">
+                                <p style="color:var(--text-muted);font-size:0.9rem;">Loading…</p>
+                            </div>
+                        </div>
+
                     </div>
 
-                    <!-- RIGHT COLUMN -->
+                    <!-- RIGHT COLUMN (employer sees applicants in left col above) -->
                     <div class="job-right-col">
 
                         <!-- Apply Card -->
@@ -531,11 +559,56 @@
                                     <span class="cd-value">${job.location}</span>
                                 </div>
                             </div>
+                            ${job.employer_id ? `
+                            <div style="margin-top:1.25rem;padding-top:1rem;border-top:1px solid var(--border-light);">
+                                <a href="view_employer.html?id=${job.employer_id}" class="btn-secondary" style="display:block;text-align:center;text-decoration:none;width:100%;box-sizing:border-box;">🏢 View Employer Profile</a>
+                            </div>` : ''}
                         </div>
 
                     </div>
                 `;
+
+                loadApplicants(jobId);
             });
+        }
+
+        function loadApplicants(jobId) {
+            const user = DataService.getCurrentUser();
+            if (!user || user.account_type !== 'company') return;
+
+            const container = document.getElementById('applicants-section');
+            if (!container) return;
+            container.style.display = 'block';
+
+            const API = `http://localhost:3000/api/jobs/${jobId}/applicants`;
+            fetch(API, { headers: { 'X-User-Id': String(user.id) } })
+                .then(r => r.ok ? r.json() : Promise.reject(r.status))
+                .then(applicants => {
+                    const body = document.getElementById('applicants-body');
+                    if (!applicants.length) {
+                        body.innerHTML = '<p style="color:var(--text-muted);font-size:0.9rem;">No one has applied yet.</p>';
+                        return;
+                    }
+                    body.innerHTML = applicants.map(a => {
+                        const date = a.applied_at ? new Date(a.applied_at).toLocaleDateString() : '';
+                        return `
+                        <div class="applicant-row">
+                            <div class="applicant-avatar" style="background:${a.avatar_color || 'var(--primary)'}">
+                                ${a.avatar_initials || '?'}
+                            </div>
+                            <div class="applicant-info">
+                                <div class="applicant-name">${a.full_name || a.email}</div>
+                                <div class="applicant-meta">${a.headline || ''}${a.location ? ' · ' + a.location : ''}</div>
+                            </div>
+                            <div class="applicant-date">${date}</div>
+                            <a href="view_profile.html?id=${a.id}" class="btn-secondary btn-sm" style="text-decoration:none;white-space:nowrap;">View Profile</a>
+                        </div>`;
+                    }).join('');
+                })
+                .catch(() => {
+                    const body = document.getElementById('applicants-body');
+                    if (body) body.innerHTML = '<p style="color:var(--text-muted);font-size:0.9rem;">Could not load applicants.</p>';
+                });
         }
 
         function handleApply(jobId) {

@@ -1,395 +1,331 @@
-# CSIT314 Intelligent Talent Matching Platform
+# ITMP — Intelligent Talent Matching Platform
 
-Software repository for the UOW CSIT314 group project. This web application is a
-recruitment system designed to improve the efficiency of job searching and talent acquisition.
+A full-stack recruitment web application built for the UOW CSIT314 group project. ITMP connects candidates with employers through AI-powered job matching, resume parsing, and profile management.
+
+---
+
+## Architecture
+
+```
+Browser → nginx (port 80) → static front-end files
+                          → /api/* → Node.js (port 3000) → MySQL
+                                                          → Python resume scanner
+```
+
+| Layer | Technology |
+|-------|-----------|
+| Front-end | Static HTML / CSS / Vanilla JS |
+| API server | Node.js + Express |
+| Database | MySQL 8 |
+| Web server | nginx |
+| Resume parser | Python 3 + spaCy + pdfminer |
+
+---
+
+## Quick Setup (Ubuntu 22.04 / 24.04)
+
+### 1. Clone the repository
+
+```bash
+git clone <repo-url>
+cd CSIT314-Intelligent-Talent-Matching-Platform-main
+```
+
+### 2. Run the installer
+
+The installer handles everything in one command — packages, MySQL, Node.js, nginx, Python venv, and directory creation.
+
+```bash
+chmod +x setup/install.sh
+sudo ./setup/install.sh
+```
+
+What `install.sh` does:
+- Installs **nginx**, **mysql-server**, **Node.js 20 LTS**, **python3**, **python3-venv**
+- Creates the `itmp_db` MySQL database and applies the full schema
+- Writes a `.env` file into `back-end/node-server/` with your DB credentials
+- Runs `npm install` for the Node server
+- Creates a Python virtual environment and installs **spaCy** + **pdfminer**
+- Copies and activates the nginx config
+- Creates `back-end/node-server/storage/` directories for file uploads
+
+### 3. Start the backend
+
+```bash
+./setup/server.sh start
+```
+
+Open **http://localhost** in your browser.
+
+---
+
+## Server Management
+
+All backend lifecycle commands are handled by `setup/server.sh`.
+
+```bash
+./setup/server.sh start     # Start the Node.js API server (background)
+./setup/server.sh stop      # Stop the server
+./setup/server.sh restart   # Restart the server
+./setup/server.sh status    # Show running state and PID
+./setup/server.sh logs      # Tail the live server log
+```
+
+The server reads credentials from `back-end/node-server/.env` automatically on start.  
+Logs are written to `logs/node.log`.
+
+---
+
+## Environment Variables
+
+The `.env` file is written by `install.sh`. You can edit it manually at any time:
+
+```
+back-end/node-server/.env
+```
+
+```env
+DB_HOST=localhost
+DB_USER=root
+DB_PASS=your_password
+DB_NAME=itmp_db
+PORT=3000
+```
+
+To run the server manually without `.env`:
+
+```bash
+DB_USER=root DB_PASS=your_password node back-end/node-server/server.js
+```
+
+---
+
+## Project Structure
+
+```
+.
+├── setup/
+│   ├── install.sh          ← Full one-command setup script
+│   ├── server.sh           ← Start / stop / restart / status / logs
+│   └── nginx.conf          ← nginx site config (template, path substituted by install.sh)
+│
+├── front-end/
+│   ├── pages/
+│   │   ├── login.html
+│   │   └── auth/           ← All authenticated pages (see table below)
+│   └── assests/
+│       ├── styling/        ← global.css, dashboard.css
+│       ├── js/             ← data.js (API client / DataService)
+│       └── images/
+│
+├── back-end/
+│   ├── node-server/
+│   │   ├── server.js       ← Express API server
+│   │   ├── .env            ← DB credentials (created by install.sh)
+│   │   ├── storage/        ← Uploaded resumes and avatars
+│   │   └── package.json
+│   └── scripting/
+│       ├── mysql-scripts/
+│       │   └── schema.sql  ← Full DB schema
+│       ├── python-scripts/
+│       │   ├── resume-scanner.py
+│       │   └── venv/       ← Python virtualenv (created by install.sh)
+│       └── bash-scripts/
+│           ├── start-site.sh
+│           └── kill-site.sh
+│
+└── logs/
+    ├── node.log            ← Node.js server output
+    └── node.pid            ← PID file for server.sh
+```
 
 ---
 
 ## Frontend Pages
 
-All frontend pages are static HTML/CSS/JS files located in the `sandbox/dashsystem/files/` directory.
-They require no server to run — open directly in a browser via `file://`.
+All pages live in `front-end/pages/auth/`. Pages are strictly split by role — candidate pages are prefixed `c_`, employer pages `e_`.
 
-### Page Overview
+### Candidate Pages
 
-| File | Description |
+| Page | Description |
 |------|-------------|
-| `c_dashboard.html` | Candidate dashboard — recommended jobs, applied history, saved jobs |
-| `profile.html` | Candidate profile page with resume display and edit modal |
-| `settings.html` | Full settings page — avatar, resume, membership, billing, privacy |
-| `search_result.html` | Dual-mode search — find jobs or find candidates with filters |
-| `job.html` | Job detail page — full listing, skill match, apply/save actions |
-| `data.js` | Shared data service — embedded JSON, localStorage persistence |
-| `jobs.json` | Reference job listings (also embedded in `data.js`) |
-| `accounts.json` | Reference user accounts (also embedded in `data.js`) |
-| `global.css` | Shared base styles and CSS variables |
-| `dashboard.css` | Dashboard and card component styles |
+| `c_dashboard.html` | Home dashboard — recommended jobs, application history, saved jobs |
+| `c_edit_profile.html` | Edit profile — skills, experience, education, resume |
+| `c_search_result.html` | Search jobs and browse employers with filters |
+| `c_view_job.html` | Full job detail — skill match, one-click apply, save |
+| `c_view_employer.html` | Employer profile — about, open positions |
+| `c_applications.html` | All applications with status tracking and filters |
+| `c_settings.html` | Account, avatar, resume, membership, privacy, notifications |
+
+### Employer Pages
+
+| Page | Description |
+|------|-------------|
+| `e_dashboard.html` | Home dashboard — recommended candidates, postings, applicants |
+| `e_edit_profile.html` | Edit company profile |
+| `e_search_result.html` | Browse and filter candidates |
+| `e_view_job.html` | Job listing detail with full applicant list |
+| `e_view_profile.html` | Candidate profile — skills match, invite to apply |
+| `e_my_jobs.html` | All job postings with applicant counts and management |
+| `e_create_job.html` | Post a new job listing |
+| `e_settings.html` | Company account, avatar, membership, privacy, notifications |
 
 ---
 
-## What Was Added
+## API Routes
 
-### `data.js` — Shared Data Service
+The Node.js server exposes all routes under `/api/`. nginx proxies `/api/*` to `http://localhost:3000`.
 
-A single JavaScript module that replaces all `fetch()` / JSON file calls.
-All data is **embedded inline as JavaScript objects**, so every page works
-on `file://` without a local server (no CORS errors).
+Authentication is header-based — pass `X-User-Id: <id>` with every request.
 
-**Key API methods:**
+### Auth
 
-| Method | Description |
-|--------|-------------|
-| `DataService.init()` | Deep-clones embedded data, merges `localStorage` overrides |
-| `DataService.onReady(cb)` | Queue or immediate callback once data is ready |
-| `DataService.getCurrentUser()` | Returns the active session user object |
-| `DataService.getRecommendedJobs()` | Jobs not yet applied to, sorted by match score |
-| `DataService.getAppliedJobs()` | Jobs the current user has applied to |
-| `DataService.getSavedJobs()` | Jobs the current user has saved (excluding applied) |
-| `DataService.searchJobs(filters)` | Filter jobs by query, work mode, job type, salary, industry, location, match % |
-| `DataService.searchCandidates(filters)` | Filter candidates by query, work mode, YOE, location, availability, skills |
-| `DataService.applyForJob(id)` | Apply and persist to `localStorage` |
-| `DataService.toggleSaveJob(id)` | Save/unsave and persist to `localStorage` |
-| `DataService.updateProfile(fields)` | Merge profile fields and persist to `localStorage` |
-| `DataService.updateAvatar(color)` | Update avatar hex colour and persist |
-| `DataService.updateResume(filename, date)` | Store resume filename and upload date |
-| `DataService.deleteResume()` | Clear stored resume |
-| `DataService.getSkillsWithMatchStatus(job)` | Returns job skills with `isMatch` flag vs current user |
-| `DataService.timeAgo(isoDate)` | Human-readable relative date string |
+| Method | Route | Description |
+|--------|-------|-------------|
+| POST | `/api/register` | Create a new account |
+| POST | `/api/login` | Log in, returns user object |
+| POST | `/api/logout` | Log out |
 
-**Embedded data:**
-- 5 job listings (`job_001` to `job_005`) — each with `responsibilities`, `requirements`, `nice_to_have`, `benefits`, and per-skill `required` flag
-- 8 user accounts — user ID 1 is the logged-in demo user (Jane Doe); IDs 3–8 are searchable candidates with varied skills, locations, and availability statuses
+### Profile
 
----
+| Method | Route | Description |
+|--------|-------|-------------|
+| GET | `/api/profile/me` | Get current user's profile |
+| PUT | `/api/profile/me` | Update current user's profile |
+| POST | `/api/profile/resume` | Upload resume (multipart) |
+| DELETE | `/api/profile/resume` | Remove resume |
+| GET | `/api/profile/candidate/:id` | Get a candidate's public profile |
+| GET | `/api/profile/employer/:id` | Get an employer's public profile |
 
-### `c_dashboard.html` — Candidate Dashboard (Updated)
+### Jobs
 
-- Profile card header is now a clickable `<a href="profile.html">` link — clicking the avatar or name navigates to the profile page
-- Job card titles are `<a href="job.html?id=...">` links to the job detail page
-- Added **Saved Jobs** section below Application History
-- All job and user data sourced from `DataService` instead of hardcoded objects
-- Header search bar submits to `search_result.html?q=...`
-- `handleApply()`, `handleSave()`, `handleUnsave()` call `DataService` mutations then re-render without a page reload
+| Method | Route | Description |
+|--------|-------|-------------|
+| GET | `/api/jobs` | List all active jobs |
+| GET | `/api/jobs/:id` | Get a single job |
+| POST | `/api/jobs` | Create a job posting (employer only) |
+| DELETE | `/api/jobs/:id` | Delete a job posting |
+| POST | `/api/jobs/:id/apply` | Apply for a job |
+| POST | `/api/jobs/:id/save` | Toggle save/unsave a job |
+| GET | `/api/jobs/:id/applicants` | Get applicants for a job (employer/owner only) |
 
----
+### Discovery
 
-### `profile.html` — Candidate Profile Page (Updated)
+| Method | Route | Description |
+|--------|-------|-------------|
+| GET | `/api/candidates` | List all candidate profiles |
+| GET | `/api/employers` | List all employer profiles |
+| GET | `/api/my/jobs` | Employer's own posted jobs |
+| GET | `/api/my/applications` | Candidate's application history |
+| GET | `/api/my/saved` | Candidate's saved job IDs |
 
-- Avatar reads `avatar_color` from `DataService`, reflecting any changes made in Settings
-- **⚙️ Settings** button in hero links to `settings.html`
-- **📄 Update Resume** button in hero links to `settings.html#resume`
-- **Resume section** — shows filename and upload date if present, or prompts the user to upload via Settings
-- **Saved Jobs section** — lists all saved jobs with company badge, title, location, salary
-- **Edit Profile modal** — inline edit for name, headline, bio, location, work mode, YOE, availability, and skills; writes back via `DataService.updateProfile()`
-- Section-level edit shortcuts route to the correct Settings panel or open the modal directly
+### Files
 
----
+| Method | Route | Description |
+|--------|-------|-------------|
+| GET | `/api/files/*` | Serve uploaded files (resumes, avatars) |
 
-### `job.html` — Job Detail Page (New)
+### Resume Parsing
 
-Reads `?id=` from the URL and renders the full job listing.
-
-**Left column sections:**
-- Hero card — company logo, title, company name, meta badges (location, work mode, job type, industry, posted date, applicant count), match score
-- About the Role (`full_description`)
-- Key Responsibilities (bulleted)
-- Requirements + Nice to Have (bulleted)
-- Skills Match — colour-coded chips:
-  - Green ✔ = user has the skill
-  - Red ✕ = required and user is missing it
-  - Grey ○ = optional, user doesn't have it
-- Benefits & Perks (bulleted)
-
-**Right sidebar:**
-- Salary range, One-Click Apply / Applied state, Save/Saved toggle
-- Job meta table (type, work mode, location, applicants, expiry)
-- Company about card (description, industry, size)
+| Method | Route | Description |
+|--------|-------|-------------|
+| POST | `/api/parse-resume` | Parse a PDF resume with the Python scanner |
 
 ---
 
-### `search_result.html` — Search Page (New)
+## Database Schema
 
-Dual-mode page toggled by a pill selector in the hero bar.
-Accepts `?q=` and `?mode=candidates` URL parameters.
+The MySQL schema is in `back-end/scripting/mysql-scripts/schema.sql` and is applied automatically by `install.sh`.
 
-#### Job Search Mode
+### Tables
 
-Filters (all live — update on every keystroke or checkbox change):
-
-| Filter | Input Type |
-|--------|-----------|
-| Location | Free-text |
-| Work Mode | Checkboxes (Remote / Hybrid / On-site) |
-| Salary Range | Min/Max number inputs |
-| Job Type | Checkboxes (Full-time / Part-time / Contract) |
-| Industry | Dropdown |
-| Minimum Match Score | Dropdown (Any / 50%+ / 70%+ / 80%+ / 90%+) |
-
-Sort options: Best Match, Salary High→Low, Salary Low→High, Newest First, Fewest Applicants.
-
-Result cards show: company badge, job title (links to `job.html`), meta tags, skill chips with match highlighting, inline apply and save buttons.
-
-#### Candidate Search Mode
-
-Filters:
-
-| Filter | Input Type |
-|--------|-----------|
-| Location | Free-text |
-| Work Mode | Checkboxes |
-| Years of Experience | Min/Max number inputs |
-| Availability | Dropdown (Immediate / 2 weeks / 1 month) |
-| Skills | Comma-separated text (all listed skills must match) |
-| Open to Work Only | Toggle switch |
-
-Candidate cards show: coloured avatar, name, headline, location/work mode/YOE meta tags, availability badge, top 6 skills, "Invite to Apply" and "Save Candidate" buttons, and profile view count.
+| Table | Description |
+|-------|-------------|
+| `users` | Core accounts — email, password, account_type (candidate/company) |
+| `candidate_profiles` | Skills, experience, education, resume path, availability |
+| `company_profiles` | Company name, ABN, description, website, industry |
+| `jobs` | Job listings with full detail, skills JSON, status |
+| `applications` | Many-to-many: candidates ↔ jobs, with status tracking |
+| `saved_jobs` | Many-to-many: users ↔ jobs saved for later |
 
 ---
 
-### `settings.html` — Settings Page (New)
+## Resume Scanner
 
-Left-nav sidebar with 8 named sections. Navigating via the sidebar or URL hash (e.g. `settings.html#resume`) jumps directly to that section. All changes show a toast notification on save.
+The Python resume scanner is at `back-end/scripting/python-scripts/resume-scanner.py`. It is called automatically by the Node server when a resume is uploaded to `/api/parse-resume`.
 
-#### Account
-- Edit name, headline, bio, location, work mode, availability, YOE, skills list
-- Separate contact & links form — email, phone, LinkedIn, GitHub, personal website
-- Change password form — validates match and minimum length (8 chars)
-- Writes via `DataService.updateProfile()` and persists to `localStorage`
+To run it manually:
 
-#### Profile Picture
-- 16-colour swatch grid with live avatar preview
-- Saved via `DataService.updateAvatar()` and reflected on all pages immediately
+```bash
+# Activate the venv first
+source back-end/scripting/python-scripts/venv/bin/activate
 
-#### Resume
-- Drag-and-drop upload zone (PDF/DOCX, max 5 MB)
-- Displays current resume filename and upload date
-- Remove button calls `DataService.deleteResume()`
-- Note: filename is stored in `localStorage` for the demo; no file is actually transmitted
-
-#### Membership
-- Premium plan banner with feature checklist (unlimited applications, priority matching, analytics, resume boost)
-- **Cancel Membership** triggers a confirmation modal and downgrades the plan in-memory
-- Free plan users see an Upgrade CTA instead
-
-#### Billing
-- Payment card display (Visa ending 4242)
-- Update card form — card number, expiry, CVC, cardholder name
-- Billing history table — 4 past invoices with Paid status badges
-
-#### Notifications
-Five email preference toggles:
-- New Job Matches
-- Application Updates
-- Profile Views
-- Product Updates & Tips
-- Marketing Emails
-
-#### Privacy
-Five visibility/consent toggles:
-- Profile Visible to Employers
-- Open to Work Badge
-- Show Contact Details to Employers
-- Allow Profile Analytics
-- Hide Profile from Current Employer
-
-#### Danger Zone
-All destructive actions require a confirmation modal.
-
-| Action | Behaviour |
-|--------|-----------|
-| Pause Account | Shows toast; in a real app would hide profile from search |
-| Download My Data | Exports current user object as a real downloadable `itmp_my_data.json` |
-| Delete All Applications | Clears `applied_jobs` and `saved_jobs` via `DataService` |
-| Delete Account | Clears data, redirects to `login.html` after 1.8 s |
-
----
-
-### `jobs.json` — Job Listing Schema
-
-Each job object contains:
-
-```json
-{
-  "id": "job_001",
-  "title": "",
-  "company": "",
-  "company_initials": "",
-  "company_about": "",
-  "company_size": "",
-  "industry": "",
-  "match_score": 0,
-  "location": "",
-  "work_mode": "",
-  "salary_min": 0,
-  "salary_max": 0,
-  "salary_display": "",
-  "job_type": "",
-  "posted_date": "YYYY-MM-DD",
-  "expires_date": "YYYY-MM-DD",
-  "applications_count": 0,
-  "description": "",
-  "full_description": "",
-  "responsibilities": [],
-  "requirements": [],
-  "nice_to_have": [],
-  "benefits": [],
-  "skills": [
-    { "name": "", "required": true }
-  ]
-}
-```
-
----
-
-### `accounts.json` — User Account Schema (Updated)
-
-Extended from the original schema. New and changed fields vs the original:
-
-| Field | Type | Description |
-|-------|------|-------------|
-| `avatar_initials` | string | 2-letter initials derived from full name |
-| `avatar_color` | string | Hex colour for avatar background |
-| `headline` | string | Short professional title shown on cards |
-| `bio` | string | About/summary paragraph |
-| `contact.linkedin` | string | LinkedIn profile URL |
-| `contact.github` | string | GitHub profile URL |
-| `contact.website` | string | Personal website URL |
-| `location` | string | City, State display string |
-| `work_mode_preference` | string | Remote / Hybrid / On-site |
-| `education` | array | Array of education objects (institution, degree, major, years, GPA) |
-| `experience` | array | Array of work history objects (title, company, dates, description) |
-| `is_premium` | boolean | Premium membership status |
-| `applied_jobs` | string[] | Array of applied job IDs |
-| `saved_jobs` | string[] | Array of saved job IDs |
-| `profile_views` | number | Employer profile view count |
-| `resume_filename` | string | Uploaded resume filename |
-| `resume_upload_date` | string | ISO date of last resume upload |
-| `availability` | string | Immediate / 2 weeks / 1 month |
-| `open_to_work` | boolean | Shown as green badge on profile and search results |
-| `joined_date` | string | ISO date account was created |
-
-Full schema:
-
-```json
-{
-  "id": 1,
-  "password": "",
-  "full_name": "",
-  "avatar_initials": "",
-  "avatar_color": "#1a56db",
-  "dob": "",
-  "headline": "",
-  "bio": "",
-  "contact": {
-    "phone": "",
-    "email": "",
-    "linkedin": "",
-    "github": "",
-    "website": ""
-  },
-  "location": "",
-  "work_mode_preference": "",
-  "education": [
-    {
-      "institution": "",
-      "degree": "",
-      "major": "",
-      "start_year": 0,
-      "end_year": 0,
-      "gpa": ""
-    }
-  ],
-  "experience": [
-    {
-      "title": "",
-      "company": "",
-      "location": "",
-      "start_date": "YYYY-MM",
-      "end_date": "YYYY-MM",
-      "current": false,
-      "description": ""
-    }
-  ],
-  "skills": [],
-  "yoe": 0,
-  "is_candidate": true,
-  "is_premium": false,
-  "applied_jobs": [],
-  "saved_jobs": [],
-  "profile_views": 0,
-  "resume_filename": "",
-  "resume_upload_date": "",
-  "availability": "",
-  "open_to_work": true,
-  "joined_date": ""
-}
-```
-
----
-
-## Resume Scanner/Parser
-
-The project has been restructured for a webserver to run the latest
-version of [ubuntu server](https://ubuntu.com/download/server) and [apache2](https://www.apache.org/licenses/LICENSE-2.0)
-
-The resume scanner application has been moved to the directory [resume-scanner.py](https://github.com/Mr-Horrigan/CSIT314-Intelligent-Talent-Matching-Platform/tree/main/back-end/scripting/python-scripts/resume-scanner.py)
-
-Currently, the experience and education sections are not producing great results in the
-JSON output. However, name, contact info, and skills are working well, and certifications
-are partially working.
-
-The following steps will provide the information necessary to get the
-[resume-scanner.py](https://github.com/Mr-Horrigan/CSIT314-Intelligent-Talent-Matching-Platform/tree/main/back-end/scripting/python-scritps) running.
-
-### Step 1
-
-Use `pip` or `pipx` to install the following libraries:
-
-```
-sudo pip install spacy
-sudo pip install pdfminer
-```
-
-or
-
-```
-sudo pipx install spacy
-sudo pipx install pdfminer
-```
-
-### Step 2
-
-To run the resume parser script, use the following command:
-
-```
-python3 resumeScanner.py john_doe_resume.pdf
+python3 back-end/scripting/python-scripts/resume-scanner.py path/to/resume.pdf
 ```
 
 ### Output
 
 ```json
 {
-  "name": "John Doe\n\nSUMMARY",
+  "name": "John Doe",
   "contact": {
     "email": "john.doe@email.com",
     "phone": "+61 412 345 678",
     "github": "github.com/johndoe",
     "linkedin": "linkedin.com/in/johndoe"
   },
-  "summary": "Results-driven Mechanical Engineer with 6+ years of experience...",
-  "experience": "Senior Mechanical Engineer\nAerotek Engineering Solutions | Sydney, NSW | Mar 2021 – Present\n...",
-  "education": "Bachelor of Engineering (Mechanical) — Honours\nUniversity of New South Wales (UNSW) | Sydney, NSW | 2014 – 2017\n...",
-  "skills": [
-    "abaqus", "ansys", "as9100", "autocad", "c", "catia", "fea",
-    "gd&t", "iso 9001", "lean", "lean manufacturing", "matlab",
-    "ms project", "python", "r", "solidworks"
-  ],
-  "projects": "Solar-Powered Water Pump — Personal Project (2022)\n...",
-  "certifications": [
-    "ca", "en", "engineers australia", "first aid",
-    "general construction induction", "mieaust",
-    "ndis worker screening", "ner", "white card"
-  ],
+  "skills": ["python", "react", "docker", "aws"],
+  "experience": "...",
+  "education": "...",
+  "certifications": ["aws-certified", "first-aid"],
   "raw_text": "..."
 }
+```
+
+> **Note:** Name, contact, and skills extraction works well. Experience and education sections produce partial results.
+
+---
+
+## nginx Configuration
+
+The nginx config template is at `setup/nginx.conf`. `install.sh` copies it to `/etc/nginx/sites-available/itmp` with the correct front-end path substituted in.
+
+To manually reload nginx after editing the config:
+
+```bash
+sudo nginx -t          # Test config syntax
+sudo systemctl reload nginx
+```
+
+---
+
+## Troubleshooting
+
+**Server won't start:**
+```bash
+./setup/server.sh logs    # Check the log output
+cat logs/node.log
+```
+
+**MySQL connection refused:**
+```bash
+sudo systemctl status mysql
+# Ensure .env credentials match your MySQL root password
+cat back-end/node-server/.env
+```
+
+**nginx 502 Bad Gateway:**  
+The Node server is not running. Start it with `./setup/server.sh start`.
+
+**Port 3000 already in use:**
+```bash
+./setup/server.sh stop
+# Or find and kill the process:
+lsof -ti:3000 | xargs kill -9
+```
+
+**Reset the database:**
+```bash
+mysql -u root -p -e "DROP DATABASE itmp_db;"
+mysql -u root -p < back-end/scripting/mysql-scripts/schema.sql
 ```

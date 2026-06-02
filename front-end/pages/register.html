@@ -258,6 +258,58 @@
             text-decoration: underline;
         }
 
+        /* ── Inline validation ──────────────────────────────────────── */
+        .field-error {
+            display: block;
+            color: #c0392b;
+            font-size: 0.82rem;
+            margin-top: 0.3rem;
+            min-height: 1.1em;
+        }
+        .input-group.has-error input,
+        .input-group.has-error select {
+            border-color: #c0392b;
+        }
+
+        /* ── Password strength meter ─────────────────────────────────── */
+        .strength-bar {
+            height: 4px;
+            border-radius: 2px;
+            background: var(--border-light, #e0e0e0);
+            margin-top: 0.5rem;
+            overflow: hidden;
+        }
+        .strength-fill {
+            height: 100%;
+            width: 0;
+            border-radius: 2px;
+            transition: width 0.3s, background-color 0.3s;
+        }
+        .strength-label {
+            display: block;
+            font-size: 0.8rem;
+            margin-top: 0.25rem;
+            min-height: 1.1em;
+        }
+
+        /* ── Password visibility toggle ─────────────────────────────── */
+        .password-wrapper { position: relative; }
+        .password-wrapper input { padding-right: 2.8rem; width: 100%; box-sizing: border-box; }
+        .btn-eye-toggle {
+            position: absolute; right: 0.75rem; top: 50%; transform: translateY(-50%);
+            background: none; border: none; cursor: pointer; color: var(--text-muted);
+            padding: 0.25rem; display: flex; align-items: center; line-height: 1;
+        }
+        .btn-eye-toggle:hover { color: var(--primary); }
+
+        /* ── Password match indicator ───────────────────────────────── */
+        .match-msg {
+            display: block;
+            font-size: 0.82rem;
+            margin-top: 0.35rem;
+            min-height: 1.1em;
+        }
+
         /* The role/section reveals can be tall — allow them room */
         #candidate-section.show { max-height: 2400px; }
 
@@ -286,14 +338,15 @@
         <div class="signup-card">
             <h1>Create an account</h1>
             
-            <form id="signup-form">
+            <form id="signup-form" novalidate>
                 
-                <div class="input-group">
+                <div class="input-group" id="group-email">
                     <label for="email">Email</label>
-                    <input type="email" id="email" name="email" placeholder="Email address" required>
+                    <input type="email" id="email" name="email" placeholder="Email address">
+                    <span class="field-error" id="err-email"></span>
                 </div>
                 
-                <div class="input-group">
+                <div class="input-group" id="group-phone">
                     <label for="phone">Phone Number</label>
                     <div class="phone-input-wrapper">
                         
@@ -543,19 +596,35 @@
                         </div>
 
                         <input type="hidden" id="country-code" name="country-code" value="+61">
-                        <input type="tel" id="phone" name="phone" placeholder="Phone number" required>
+                        <input type="tel" id="phone" name="phone" placeholder="Phone number">
                     </div>
+                    <span class="field-error" id="err-phone"></span>
                 </div>
                 
                 <div class="input-row">
-                    <div class="input-group">
+                    <div class="input-group" id="group-password">
                         <label for="password">Password</label>
-                        <input type="password" id="password" name="password" placeholder="Password" required>
+                        <div class="password-wrapper">
+                            <input type="password" id="password" name="password" placeholder="Password">
+                            <button type="button" class="btn-eye-toggle" onclick="togglePassword('password',this)" tabindex="-1" aria-label="Toggle password visibility">
+                                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                            </button>
+                        </div>
+                        <div class="strength-bar"><div class="strength-fill" id="strength-fill"></div></div>
+                        <span class="strength-label" id="strength-label"></span>
+                        <span class="field-error" id="err-password"></span>
                     </div>
 
-                    <div class="input-group">
+                    <div class="input-group" id="group-confirm-password">
                         <label for="confirm-password">Confirm Password</label>
-                        <input type="password" id="confirm-password" name="confirm-password" placeholder="Confirm Password" required>
+                        <div class="password-wrapper">
+                            <input type="password" id="confirm-password" name="confirm-password" placeholder="Confirm Password">
+                            <button type="button" class="btn-eye-toggle" onclick="togglePassword('confirm-password',this)" tabindex="-1" aria-label="Toggle password visibility">
+                                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                            </button>
+                        </div>
+                        <span class="match-msg" id="match-msg"></span>
+                        <span class="field-error" id="err-confirm-password"></span>
                     </div>
                 </div>
 
@@ -586,6 +655,7 @@
                             Employer
                         </button>
                     </div>
+                    <span class="field-error" id="err-role"></span>
                 </div>
 
                 <div class="reveal-container" id="candidate-section">
@@ -697,9 +767,10 @@
                     </button>
 
                     <div class="input-row">
-                        <div class="input-group">
+                        <div class="input-group" id="group-company-name">
                             <label for="company-name">Company name</label>
-                            <input type="text" id="company-name" name="company-name" placeholder="Official company name" required>
+                            <input type="text" id="company-name" name="company-name" placeholder="Official company name">
+                            <span class="field-error" id="err-company-name"></span>
                         </div>
                         <div class="input-group">
                             <label for="company-website">Company Website <span style="font-weight:normal; color:#666;">(Optional)</span></label>
@@ -708,9 +779,9 @@
                     </div>
 
                     <div class="input-row">
-                        <div class="input-group">
+                        <div class="input-group" id="group-company-industry">
                             <label for="company-industry">Industry</label>
-                            <select id="company-industry" name="company-industry" required>
+                            <select id="company-industry" name="company-industry">
                                 <option value="" disabled selected>Select an industry...</option>
                                 <option value="technology">Technology & Software</option>
                                 <option value="healthcare">Healthcare & Medical</option>
@@ -721,10 +792,12 @@
                                 <option value="construction">Construction & Real Estate</option>
                                 <option value="other">Other</option>
                             </select>
+                            <span class="field-error" id="err-company-industry"></span>
                         </div>
-                        <div class="input-group">
+                        <div class="input-group" id="group-abn">
                             <label for="abn">ABN</label>
-                            <input type="text" id="abn" name="abn" placeholder="Australian Business Number" required>
+                            <input type="text" id="abn" name="abn" placeholder="Australian Business Number">
+                            <span class="field-error" id="err-abn"></span>
                         </div>
                     </div>
 
@@ -772,6 +845,16 @@
     </footer>
 
     <script>
+        // --- PASSWORD TOGGLE ---
+        const EYE_OPEN = `<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>`;
+        const EYE_SHUT = `<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>`;
+        function togglePassword(inputId, btn) {
+            const inp  = document.getElementById(inputId);
+            const show = inp.type === 'password';
+            inp.type   = show ? 'text' : 'password';
+            btn.innerHTML = show ? EYE_SHUT : EYE_OPEN;
+        }
+
         // --- CUSTOM SELECT LOGIC ---
         const select = document.getElementById("country-custom-select");
         const selected = select.querySelector(".selected");
@@ -917,6 +1000,84 @@
             }
         }
 
+        // --- PASSWORD STRENGTH & MATCH ---
+        function scorePassword(pw) {
+            let s = 0;
+            if (pw.length >= 8)           s++;
+            if (pw.length >= 12)          s++;
+            if (/[A-Z]/.test(pw))         s++;
+            if (/[0-9]/.test(pw))         s++;
+            if (/[^A-Za-z0-9]/.test(pw))  s++;
+            return Math.min(s, 4);
+        }
+
+        const STRENGTH_META = [
+            null,
+            { label: 'Weak',   color: '#e74c3c' },
+            { label: 'Fair',   color: '#e67e22' },
+            { label: 'Good',   color: '#f1c40f' },
+            { label: 'Strong', color: '#27ae60' },
+        ];
+
+        function updateStrength() {
+            const pw    = document.getElementById('password').value;
+            const fill  = document.getElementById('strength-fill');
+            const label = document.getElementById('strength-label');
+            if (!pw) {
+                fill.style.width  = '0';
+                label.textContent = '';
+                label.style.color = '';
+                checkMatch();
+                return;
+            }
+            const score = Math.max(1, scorePassword(pw));
+            const meta  = STRENGTH_META[score];
+            fill.style.width           = (score * 25) + '%';
+            fill.style.backgroundColor = meta.color;
+            label.textContent          = meta.label;
+            label.style.color          = meta.color;
+            checkMatch();
+        }
+
+        function checkMatch() {
+            const pw  = document.getElementById('password').value;
+            const cf  = document.getElementById('confirm-password').value;
+            const msg = document.getElementById('match-msg');
+            if (!cf) { msg.textContent = ''; return; }
+            if (pw === cf) {
+                msg.textContent = '✓ Passwords match';
+                msg.style.color = '#27ae60';
+            } else {
+                msg.textContent = '✗ Passwords do not match';
+                msg.style.color = '#e74c3c';
+            }
+        }
+
+        document.getElementById('password').addEventListener('input', updateStrength);
+        document.getElementById('confirm-password').addEventListener('input', checkMatch);
+
+        // --- INLINE VALIDATION HELPERS ---
+        function showError(errId, msg) {
+            const err = document.getElementById(errId);
+            if (!err) return;
+            err.textContent = msg;
+            const group = err.closest('.input-group');
+            if (group) group.classList.add('has-error');
+        }
+        function clearError(errId) {
+            const err = document.getElementById(errId);
+            if (!err) return;
+            err.textContent = '';
+            const group = err.closest('.input-group');
+            if (group) group.classList.remove('has-error');
+        }
+
+        ['email', 'phone', 'password', 'confirm-password', 'company-name', 'abn'].forEach(id => {
+            const el = document.getElementById(id);
+            if (el) el.addEventListener('input', () => clearError('err-' + id));
+        });
+        document.getElementById('company-industry').addEventListener('change', () => clearError('err-company-industry'));
+
         // --- FORM SUBMISSION ---
         document.getElementById('signup-form').addEventListener('submit', async function(e) {
             e.preventDefault();
@@ -924,9 +1085,10 @@
             const isCandidate = document.getElementById('candidate-section').classList.contains('show');
             const isEmployer  = document.getElementById('employer-section').classList.contains('show');
             if (!isCandidate && !isEmployer) {
-                alert('Please select a role (Candidate or Employer) first.');
+                document.getElementById('err-role').textContent = 'Please select a role to continue.';
                 return;
             }
+            document.getElementById('err-role').textContent = '';
 
             const email    = document.getElementById('email').value.trim();
             const password = document.getElementById('password').value;
@@ -934,20 +1096,36 @@
             const phone    = (document.getElementById('country-code').value || '+61') +
                              document.getElementById('phone').value.trim();
 
-            if (password !== confirm) { alert('Passwords do not match.'); return; }
+            let valid = true;
+            ['err-email', 'err-phone', 'err-password', 'err-confirm-password'].forEach(clearError);
+            if (isEmployer) ['err-company-name', 'err-company-industry', 'err-abn'].forEach(clearError);
+
+            if (!email) { showError('err-email', 'Please fill out this field.'); valid = false; }
+            if (!document.getElementById('phone').value.trim()) { showError('err-phone', 'Please fill out this field.'); valid = false; }
+            if (!password) { showError('err-password', 'Please fill out this field.'); valid = false; }
+            if (!confirm)  { showError('err-confirm-password', 'Please fill out this field.'); valid = false; }
+            else if (password !== confirm) { showError('err-confirm-password', 'Passwords do not match.'); valid = false; }
+
+            if (isEmployer) {
+                if (!document.getElementById('company-name').value.trim()) { showError('err-company-name', 'Please fill out this field.'); valid = false; }
+                if (!document.getElementById('company-industry').value)     { showError('err-company-industry', 'Please select an industry.'); valid = false; }
+                if (!document.getElementById('abn').value.trim())           { showError('err-abn', 'Please fill out this field.'); valid = false; }
+            }
+
+            if (!valid) return;
 
             const body = { email, password, phone };
 
             if (isCandidate) {
-                body.account_type  = 'candidate';
-                body.first_name    = document.getElementById('first-name').value.trim();
-                body.last_name     = document.getElementById('last-name').value.trim();
-                body.yoe           = document.getElementById('years-experience').value || 0;
-                body.skills        = document.getElementById('skills').value.trim();
+                body.account_type = 'candidate';
+                body.first_name   = document.getElementById('first-name').value.trim();
+                body.last_name    = document.getElementById('last-name').value.trim();
+                body.yoe          = document.getElementById('years-experience').value || 0;
+                body.skills       = document.getElementById('skills').value.trim();
             } else {
-                body.account_type    = 'company';
-                body.company_name    = document.getElementById('company-name').value.trim();
-                body.abn             = document.getElementById('abn').value.trim();
+                body.account_type     = 'company';
+                body.company_name     = document.getElementById('company-name').value.trim();
+                body.abn              = document.getElementById('abn').value.trim();
                 body.company_industry = document.getElementById('company-industry').value;
                 body.company_website  = document.getElementById('company-website').value.trim();
             }

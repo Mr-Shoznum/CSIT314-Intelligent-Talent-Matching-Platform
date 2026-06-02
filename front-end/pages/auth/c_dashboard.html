@@ -76,7 +76,9 @@
         </div>
 
         <div class="header-nav">
-            <a href="search_result.html">Browse Jobs</a>
+            <a href="c_search_result.html">Browse Jobs</a>
+            <a href="c_applications.html">My Applications</a>
+            <a href="c_settings.html">Settings</a>
             <a href="#" onclick="DataService.logout();return false;">Sign Out</a>
         </div>
     </header>
@@ -132,7 +134,7 @@
                 <div class="dashboard-section">
                     <div class="section-header">
                         <h2>Top Recommended Jobs</h2>
-                        <a href="search_result.html" class="view-all">View All</a>
+                        <a href="c_search_result.html" class="view-all">View All</a>
                     </div>
                     <div class="job-list" id="job-recommendations-container"></div>
                     <div class="card empty-state" id="recommend-empty" style="display:none;">
@@ -219,7 +221,7 @@
                         </svg>
                         Applied
                     </button>
-                    <a href="view_job.html?id=${job.id}" class="btn-text" style="color:#004a99;">View Job</a>
+                    <a href="c_view_job.html?id=${job.id}" class="btn-text" style="color:#004a99;">View Job</a>
                 `;
             } else if (mode === 'saved') {
                 actionButtonsHtml = `
@@ -239,7 +241,7 @@
             card.innerHTML = `
                 <div class="job-card-header">
                     <div>
-                        <a href="view_job.html?id=${job.id}" class="job-card-title-link">
+                        <a href="c_view_job.html?id=${job.id}" class="job-card-title-link">
                             <h3>${job.title}</h3>
                         </a>
                         <p class="company-name">${job.company}</p>
@@ -320,7 +322,7 @@
 
         function handleSearch() {
             const q = document.getElementById('search-input').value.trim();
-            if (q) window.location.href = `search_result.html?q=${encodeURIComponent(q)}`;
+            if (q) window.location.href = `c_search_result.html?q=${encodeURIComponent(q)}`;
         }
 
         document.getElementById('search-input').addEventListener('keydown', (e) => {

@@ -121,11 +121,11 @@
         </a>
         <div class="header-search">
             <input type="text" placeholder="Search for candidates..." class="quick-search-input" id="header-search">
-            <button class="btn-search-small" onclick="window.location.href='search_result.html?mode=candidates&role=employer&q='+encodeURIComponent(document.getElementById('header-search').value)">Search</button>
+            <button class="btn-search-small" onclick="window.location.href='e_search_result.html?q='+encodeURIComponent(document.getElementById('header-search').value)">Search</button>
         </div>
         <div class="header-nav">
             <a href="e_dashboard.html">Dashboard</a>
-            <a href="search_result.html?mode=candidates&role=employer">Browse Candidates</a>
+            <a href="e_search_result.html">Browse Candidates</a>
             <a href="#" onclick="DataService.logout();return false;">Sign Out</a>
         </div>
     </header>
@@ -151,8 +151,8 @@
                 </div>
                 <div class="hero-actions">
                     <button class="btn-primary btn-sm" onclick="openEditModal()">✏️ Edit Profile</button>
-                    <a href="create_job.html" class="btn-settings-link">➕ Post a Job</a>
-                    <a href="settings.html" class="btn-settings-link">⚙️ Settings</a>
+                    <a href="e_create_job.html" class="btn-settings-link">➕ Post a Job</a>
+                    <a href="e_settings.html" class="btn-settings-link">⚙️ Settings</a>
                 </div>
             </div>
 
@@ -191,7 +191,7 @@
             <!-- Open Roles -->
             <div class="card profile-section-card">
                 <h2>💼 Open Roles
-                    <a href="create_job.html" class="section-edit-link">+ Post a Job</a>
+                    <a href="e_create_job.html" class="section-edit-link">+ Post a Job</a>
                 </h2>
                 <div class="roles-list" id="pg-roles-list"></div>
                 <div class="empty-state" id="pg-roles-empty" style="display:none;font-style:italic;">No active job postings yet.</div>
@@ -348,7 +348,7 @@
                         totalApplicants += (j.applications_count || 0);
                         const ago = (j.posted_date && DataService.timeAgo) ? DataService.timeAgo(j.posted_date) : '';
                         return `
-                            <a class="role-card" href="view_job.html?id=${j.id}">
+                            <a class="role-card" href="e_view_job.html?id=${j.id}">
                                 <div class="role-badge">${j.company_initials || initials(emp.company_name)}</div>
                                 <div class="role-info">
                                     <div class="role-title">${j.title}</div>

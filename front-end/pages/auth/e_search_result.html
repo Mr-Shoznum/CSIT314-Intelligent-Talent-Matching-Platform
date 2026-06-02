@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Find Candidates – ITMP</title>
+    <link rel="stylesheet" href="../../assests/styling/global.css">
+    <link rel="stylesheet" href="../../assests/styling/dashboard.css">
+    <link rel="icon" type="image/x-icon" href="../../assests/images/ITMP-icon-logo.ico">
+    <style>
+        .search-main { padding: 2rem; align-items: flex-start; }
+        .search-wrapper { width: 100%; max-width: 1200px; margin: 0 auto; }
+        .back-link { display: inline-flex; align-items: center; gap: 0.4rem; color: var(--primary); font-weight: bold; font-size: 0.9rem; text-decoration: none; margin-bottom: 1rem; }
+        .back-link:hover { text-decoration: underline; }
+        .search-hero { background: linear-gradient(135deg, var(--primary) 0%, var(--primary-hover) 100%); border-radius: var(--radius-card); padding: 2rem 2.5rem; margin-bottom: 1.5rem; color: white; }
+        .search-hero h1 { font-size: 1.5rem; margin-bottom: 1.25rem; text-align: left; color: white; }
+        .search-input-row { display: flex; gap: 0.75rem; }
+        .search-input-row input { flex: 1; padding: 0.75rem 1.25rem; border-radius: var(--radius-btn); border: none; font-size: 1rem; outline: none; }
+        .btn-search-main { background: white; color: var(--primary); border: none; padding: 0.75rem 1.75rem; border-radius: var(--radius-btn); font-weight: bold; font-size: 0.95rem; cursor: pointer; white-space: nowrap; }
+        .search-body { display: grid; grid-template-columns: 280px 1fr; gap: 1.5rem; align-items: start; }
+        .filter-sidebar { display: flex; flex-direction: column; gap: 1rem; }
+        .filter-card { padding: 1.5rem; }
+        .filter-card h3 { font-size: 0.95rem; font-weight: bold; color: var(--text-main); margin-bottom: 1rem; }
+        .filter-group { margin-bottom: 1.25rem; }
+        .filter-group:last-child { margin-bottom: 0; }
+        .filter-label { display: block; font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.5px; font-weight: bold; color: var(--text-muted); margin-bottom: 0.5rem; }
+        .filter-group input[type="text"], .filter-group input[type="number"], .filter-group select { width: 100%; padding: 0.5rem 0.75rem; border: 1.5px solid var(--border-color); border-radius: var(--radius-btn); font-size: 0.88rem; font-family: inherit; color: var(--text-main); box-sizing: border-box; outline: none; }
+        .filter-group input:focus, .filter-group select:focus { border-color: var(--primary); }
+        .check-list { display: flex; flex-direction: column; gap: 0.4rem; }
+        .check-item { display: flex; align-items: center; gap: 0.5rem; font-size: 0.88rem; color: var(--text-main); cursor: pointer; }
+        .check-item input[type="checkbox"] { accent-color: var(--primary); width: 15px; height: 15px; cursor: pointer; }
+        .salary-row { display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; }
+        .filter-toggle { display: flex; align-items: center; justify-content: space-between; font-size: 0.88rem; color: var(--text-main); }
+        .toggle-switch { position: relative; width: 36px; height: 20px; }
+        .toggle-switch input { display: none; }
+        .toggle-slider { position: absolute; inset: 0; background: var(--border-color); border-radius: 20px; cursor: pointer; transition: background 0.2s; }
+        .toggle-slider::after { content: ''; position: absolute; left: 3px; top: 3px; width: 14px; height: 14px; border-radius: 50%; background: white; transition: transform 0.2s; }
+        .toggle-switch input:checked + .toggle-slider { background: var(--primary); }
+        .toggle-switch input:checked + .toggle-slider::after { transform: translateX(16px); }
+        .btn-clear-filters { width: 100%; background: none; border: 1.5px solid var(--border-color); color: var(--text-muted); padding: 0.5rem; border-radius: var(--radius-btn); font-size: 0.85rem; font-weight: bold; cursor: pointer; }
+        .btn-clear-filters:hover { border-color: var(--primary); color: var(--primary); }
+        .results-area { display: flex; flex-direction: column; gap: 1rem; }
+        .results-header { display: flex; justify-content: space-between; align-items: center; padding: 0 0.25rem; }
+        .results-count { font-size: 0.9rem; color: var(--text-muted); }
+        .results-count strong { color: var(--text-main); }
+        .result-candidate-card { padding: 1.5rem; }
+        .rcc-top { display: flex; gap: 1rem; align-items: flex-start; }
+        .cand-avatar { width: 56px; height: 56px; border-radius: 50%; color: white; font-weight: bold; font-size: 1.1rem; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+        .cand-info { flex: 1; }
+        .cand-name { font-size: 1.05rem; font-weight: bold; color: var(--text-main); }
+        .cand-name-link { color: var(--text-main); text-decoration: none; }
+        .cand-name-link:hover { color: var(--primary); text-decoration: underline; }
+        .cand-avatar-link { text-decoration: none; cursor: pointer; }
+        .cand-headline { font-size: 0.9rem; color: var(--text-muted); margin: 0.15rem 0; }
+        .cand-meta { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 0.5rem; }
+        .meta-tag { font-size: 0.8rem; background: var(--bg-light-hover); padding: 0.25rem 0.65rem; border-radius: 20px; color: var(--text-muted); font-weight: bold; }
+        .cand-skills { display: flex; flex-wrap: wrap; gap: 0.4rem; margin: 0.9rem 0; }
+        .cand-actions { display: flex; gap: 0.75rem; align-items: center; padding-top: 1rem; border-top: 1px solid var(--border-light); }
+        .avail-badge { padding: 0.25rem 0.7rem; border-radius: 20px; font-size: 0.78rem; font-weight: bold; }
+        .avail-immediate { background: #e6ffe6; color: var(--success); border: 1px solid var(--success); }
+        .avail-twoweeks  { background: #fff8e6; color: #b08000; border: 1px solid #f0c040; }
+        .avail-month     { background: #f0f0f0; color: #555; border: 1px solid #ccc; }
+        .btn-text.cand-saved { color: var(--primary); }
+        .results-empty { text-align: center; padding: 3rem 2rem; color: var(--text-muted); }
+        .results-empty .empty-icon { font-size: 3rem; margin-bottom: 1rem; }
+        @media (max-width: 860px) { .search-body { grid-template-columns: 1fr; } .filter-sidebar { order: 2; } }
+    </style>
+</head>
+<body>
+    <header>
+        <a href="e_dashboard.html" class="header-logo-link">
+            <div class="itmp-logo-placeholder"><img src="../../assests/images/ITMP.png" style="max-width: 100px;"></div>
+        </a>
+        <div class="header-search" style="display:none;"></div>
+        <div class="header-nav">
+            <a href="e_dashboard.html">Dashboard</a>
+            <a href="e_edit_profile.html">Company Profile</a>
+            <a href="e_my_jobs.html">My Jobs</a>
+            <a href="e_settings.html">Settings</a>
+            <a href="#" onclick="DataService.logout();return false;">Sign Out</a>
+        </div>
+    </header>
+
+    <main class="search-main dashboard-main">
+        <div class="search-wrapper">
+            <a href="e_dashboard.html" class="back-link">← Back to Dashboard</a>
+
+            <div class="search-hero">
+                <h1>Find Talented Candidates</h1>
+                <div class="search-input-row">
+                    <input type="text" id="main-search" placeholder="Search by name, skill or location…" onkeydown="if(event.key==='Enter') runSearch()">
+                    <button class="btn-search-main" onclick="runSearch()">Search</button>
+                </div>
+            </div>
+
+            <div class="search-body">
+                <aside class="filter-sidebar">
+                    <div class="filter-card card">
+                        <h3>🎛 Filters</h3>
+                        <div class="filter-group">
+                            <label class="filter-label">Location</label>
+                            <input type="text" id="cf-location" placeholder="e.g. Sydney" oninput="runSearch()">
+                        </div>
+                        <div class="filter-group">
+                            <label class="filter-label">Work Mode</label>
+                            <div class="check-list">
+                                <label class="check-item"><input type="checkbox" value="Remote"  onchange="runSearch()"> Remote</label>
+                                <label class="check-item"><input type="checkbox" value="Hybrid"  onchange="runSearch()"> Hybrid</label>
+                                <label class="check-item"><input type="checkbox" value="On-site" onchange="runSearch()"> On-site</label>
+                            </div>
+                        </div>
+                        <div class="filter-group">
+                            <label class="filter-label">Years of Experience</label>
+                            <div class="salary-row">
+                                <input type="number" id="cf-yoe-min" placeholder="Min" min="0" oninput="runSearch()">
+                                <input type="number" id="cf-yoe-max" placeholder="Max" min="0" oninput="runSearch()">
+                            </div>
+                        </div>
+                        <div class="filter-group">
+                            <label class="filter-label">Availability</label>
+                            <select id="cf-avail" onchange="runSearch()">
+                                <option value="">Any</option>
+                                <option>Immediate</option><option>2 weeks</option><option>1 month</option>
+                            </select>
+                        </div>
+                        <div class="filter-group">
+                            <label class="filter-label">Skills (comma-separated)</label>
+                            <input type="text" id="cf-skills" placeholder="e.g. Python, React" oninput="runSearch()">
+                        </div>
+                        <div class="filter-group">
+                            <div class="filter-toggle">
+                                <span>Open to work only</span>
+                                <label class="toggle-switch">
+                                    <input type="checkbox" id="cf-open" onchange="runSearch()">
+                                    <span class="toggle-slider"></span>
+                                </label>
+                            </div>
+                        </div>
+                        <button class="btn-clear-filters" onclick="clearFilters()">Clear all filters</button>
+                    </div>
+                </aside>
+
+                <div class="results-area">
+                    <div class="results-header">
+                        <div class="results-count" id="results-count">Showing <strong>0</strong> candidates</div>
+                    </div>
+                    <div id="results-list"></div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer class="minimal-footer">
+        <div class="footer-links"><a href="#">Terms of Service</a><a href="#">Privacy Policy</a></div>
+        <div class="footer-copyright">&copy; 2026 ITMP. All rights reserved.</div>
+    </footer>
+
+    <script src="../../assests/js/data.js"></script>
+    <script>
+        const savedCandidateIds = new Set();
+
+        function candidateId(c) { return c.id != null ? c.id : (c.full_name||'').toLowerCase().trim().replace(/[^a-z0-9]+/g,'-').replace(/(^-|-$)/g,''); }
+
+        function getFilters() {
+            const workModes = [...document.querySelectorAll('.check-list input[type=checkbox]:not(#cf-open):checked')].map(c => c.value);
+            const skillRaw  = document.getElementById('cf-skills').value;
+            return {
+                query:        document.getElementById('main-search').value,
+                location:     document.getElementById('cf-location').value,
+                workMode:     workModes,
+                yoeMin:       +document.getElementById('cf-yoe-min').value || null,
+                yoeMax:       +document.getElementById('cf-yoe-max').value || null,
+                availability: document.getElementById('cf-avail').value,
+                openToWork:   document.getElementById('cf-open').checked,
+                skills:       skillRaw ? skillRaw.split(',').map(s => s.trim()).filter(Boolean) : [],
+            };
+        }
+
+        function runSearch() {
+            DataService.onReady(() => {
+                const filters    = getFilters();
+                const candidates = DataService.searchCandidates(filters);
+                const list       = document.getElementById('results-list');
+                document.getElementById('results-count').innerHTML = `Showing <strong>${candidates.length}</strong> candidate${candidates.length !== 1 ? 's' : ''}`;
+                if (!candidates.length) { list.innerHTML = `<div class="results-empty"><div class="empty-icon">👥</div><p>No candidates match your filters.</p></div>`; return; }
+                const availClass = a => a === 'Immediate' ? 'avail-immediate' : a === '2 weeks' ? 'avail-twoweeks' : 'avail-month';
+                list.innerHTML = candidates.map(c => {
+                    const id = candidateId(c);
+                    const topSkills = c.skills.slice(0, 6).map(s => `<span class="skill-tag">${s}</span>`).join('');
+                    const isSaved = savedCandidateIds.has(String(id));
+                    return `
+                    <div class="card result-candidate-card">
+                        <div class="rcc-top">
+                            <a href="e_view_profile.html?id=${id}" class="cand-avatar-link">
+                                <div class="cand-avatar" style="background:${c.avatar_color}">${c.avatar_initials}</div>
+                            </a>
+                            <div class="cand-info">
+                                <div class="cand-name">
+                                    <a href="e_view_profile.html?id=${id}" class="cand-name-link">${c.full_name}</a>
+                                    ${c.open_to_work ? '<span style="font-size:0.78rem;color:var(--success);font-weight:bold;margin-left:0.5rem;">● Open to work</span>' : ''}
+                                </div>
+                                <div class="cand-headline">${c.headline}</div>
+                                <div class="cand-meta">
+                                    <span class="meta-tag">📍 ${c.location}</span>
+                                    <span class="meta-tag">🖥️ ${c.work_mode_preference}</span>
+                                    <span class="meta-tag">💼 ${c.yoe} yrs exp</span>
+                                    <span class="avail-badge ${availClass(c.availability)}">⏱ ${c.availability}</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="cand-skills">${topSkills}</div>
+                        <div class="cand-actions">
+                            <button class="btn-primary btn-sm" onclick="doInvite('${id}')">Invite to Apply</button>
+                            <button class="btn-text ${isSaved ? 'cand-saved' : ''}" id="csave-${id}" onclick="doSaveCandidate('${id}')">${isSaved ? '★ Saved' : '☆ Save Candidate'}</button>
+                            <a href="e_view_profile.html?id=${id}" class="btn-text" style="margin-left:auto;">View profile →</a>
+                        </div>
+                    </div>`;
+                }).join('');
+            });
+        }
+
+        function doInvite(id) {
+            if (window.DataService && DataService.inviteCandidate) {
+                try { DataService.inviteCandidate(id); } catch (e) {}
+            }
+            alert('Invitation to apply sent to the candidate.');
+        }
+
+        function doSaveCandidate(id) {
+            const key = String(id);
+            if (savedCandidateIds.has(key)) savedCandidateIds.delete(key);
+            else savedCandidateIds.add(key);
+            if (window.DataService && DataService.toggleSaveCandidate) {
+                try { DataService.toggleSaveCandidate(id); } catch (e) {}
+            }
+            const btn = document.getElementById(`csave-${id}`);
+            if (btn) {
+                const on = savedCandidateIds.has(key);
+                btn.textContent = on ? '★ Saved' : '☆ Save Candidate';
+                btn.classList.toggle('cand-saved', on);
+            }
+        }
+
+        function clearFilters() {
+            document.querySelectorAll('.filter-card input[type=text]').forEach(i => i.value = '');
+            document.querySelectorAll('.filter-card input[type=number]').forEach(i => i.value = '');
+            document.querySelectorAll('.filter-card input[type=checkbox]').forEach(i => i.checked = false);
+            document.querySelectorAll('.filter-card select').forEach(s => s.selectedIndex = 0);
+            runSearch();
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const q = new URLSearchParams(window.location.search).get('q');
+            if (q) document.getElementById('main-search').value = q;
+            DataService.onReady(() => runSearch());
+        });
+    </script>
+</body>
+</html>

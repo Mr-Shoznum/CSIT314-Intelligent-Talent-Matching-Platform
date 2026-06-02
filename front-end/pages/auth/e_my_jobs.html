@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Job Postings – ITMP</title>
+    <link rel="stylesheet" href="../../assests/styling/global.css">
+    <link rel="stylesheet" href="../../assests/styling/dashboard.css">
+    <link rel="icon" type="image/x-icon" href="../../assests/images/ITMP-icon-logo.ico">
+    <style>
+        .myjobs-main { padding: 2rem; flex-direction: column; align-items: center; justify-content: flex-start; }
+        .myjobs-wrapper { width: 100%; max-width: 900px; }
+        .back-link { display: block; color: var(--primary); font-weight: bold; font-size: 0.9rem; text-decoration: none; margin-bottom: 1rem; }
+        .back-link:hover { text-decoration: underline; }
+        .myjobs-hero { padding: 1.75rem 2rem; background: linear-gradient(135deg,#ffffff 0%, var(--bg-light-hover) 100%); border-left: 5px solid var(--primary); margin-bottom: 1.5rem; display: flex; justify-content: space-between; align-items: center; }
+        .myjobs-hero h1 { font-size: 1.5rem; color: var(--text-main); margin-bottom: 0.3rem; text-align: left; }
+        .myjobs-hero p { color: var(--text-muted); font-size: 0.9rem; }
+        .filter-bar { display: flex; gap: 0.5rem; margin-bottom: 1.25rem; flex-wrap: wrap; }
+        .filter-chip { padding: 0.35rem 1rem; border-radius: 20px; border: 1.5px solid var(--border-color); background: none; color: var(--text-muted); font-size: 0.85rem; font-weight: bold; cursor: pointer; transition: all 0.15s; }
+        .filter-chip.active { border-color: var(--primary); color: var(--primary); background: #e8f0ff; }
+        .posting-card { padding: 1.5rem; }
+        .posting-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 1rem; }
+        .posting-title { font-size: 1.1rem; font-weight: bold; }
+        .posting-title a { color: var(--primary); text-decoration: none; }
+        .posting-title a:hover { text-decoration: underline; }
+        .posting-meta { display: flex; flex-wrap: wrap; gap: 0.5rem; margin: 0.6rem 0; }
+        .meta-tag { font-size: 0.8rem; background: var(--bg-light-hover); padding: 0.25rem 0.65rem; border-radius: 20px; color: var(--text-muted); font-weight: bold; }
+        .posting-actions { display: flex; gap: 0.75rem; align-items: center; flex-wrap: wrap; margin-top: 1rem; padding-top: 1rem; border-top: 1px solid var(--border-light); }
+        .status-pill { padding: 0.3rem 0.85rem; border-radius: 20px; font-size: 0.78rem; font-weight: bold; white-space: nowrap; }
+        .status-open   { background: #e6ffe6; color: var(--success); border: 1px solid var(--success); }
+        .status-closed { background: #f0f0f0; color: #555; border: 1px solid #ccc; }
+        .status-draft  { background: #fff8e6; color: #b08000; border: 1px solid #f0c040; }
+        .applicant-count { font-weight: bold; color: var(--primary); font-size: 0.9rem; background: var(--bg-light-hover); padding: 0.3rem 0.85rem; border-radius: 20px; }
+        .empty-state { text-align: center; padding: 4rem 2rem; color: var(--text-muted); }
+        .empty-state .empty-icon { font-size: 3rem; margin-bottom: 1rem; }
+        .jobs-list { display: flex; flex-direction: column; gap: 1rem; }
+        .summary-bar { display: grid; grid-template-columns: repeat(3,1fr); gap: 1rem; margin-bottom: 1.5rem; }
+        .summary-stat { background: white; border: 1.5px solid var(--border-light); border-radius: var(--radius-card); padding: 1rem; text-align: center; }
+        .summary-stat .s-num  { font-size: 1.6rem; font-weight: bold; color: var(--primary); }
+        .summary-stat .s-label{ font-size: 0.8rem; color: var(--text-muted); margin-top: 0.2rem; }
+    </style>
+</head>
+<body>
+    <header>
+        <a href="e_dashboard.html" class="header-logo-link">
+            <div class="itmp-logo-placeholder"><img src="../../assests/images/ITMP.png" style="max-width: 100px;"></div>
+        </a>
+        <div class="header-search">
+            <input type="text" placeholder="Search for candidates..." class="quick-search-input" id="header-search">
+            <button class="btn-search-small"
+                onclick="window.location.href='e_search_result.html?q='+encodeURIComponent(document.getElementById('header-search').value)">Search</button>
+        </div>
+        <div class="header-nav">
+            <a href="e_dashboard.html">Dashboard</a>
+            <a href="e_search_result.html">Browse Candidates</a>
+            <a href="e_settings.html">Settings</a>
+            <a href="#" onclick="DataService.logout();return false;">Sign Out</a>
+        </div>
+    </header>
+
+    <main class="myjobs-main dashboard-main">
+        <div class="myjobs-wrapper">
+            <a href="e_dashboard.html" class="back-link">← Back to Dashboard</a>
+
+            <div class="card myjobs-hero">
+                <div>
+                    <h1>📋 My Job Postings</h1>
+                    <p>Manage your listings and review applicants.</p>
+                </div>
+                <a href="e_create_job.html" class="btn-primary" style="text-decoration:none;white-space:nowrap;">+ Post New Job</a>
+            </div>
+
+            <div class="summary-bar">
+                <div class="summary-stat"><div class="s-num" id="stat-total">0</div><div class="s-label">Total Listings</div></div>
+                <div class="summary-stat"><div class="s-num" id="stat-open" style="color:var(--success);">0</div><div class="s-label">Active</div></div>
+                <div class="summary-stat"><div class="s-num" id="stat-apps">0</div><div class="s-label">Total Applicants</div></div>
+            </div>
+
+            <div class="filter-bar">
+                <button class="filter-chip active" onclick="setFilter('all', this)">All</button>
+                <button class="filter-chip" onclick="setFilter('open', this)">Active</button>
+                <button class="filter-chip" onclick="setFilter('draft', this)">Draft</button>
+                <button class="filter-chip" onclick="setFilter('closed', this)">Closed</button>
+            </div>
+
+            <div class="jobs-list" id="jobs-list"></div>
+
+            <div class="empty-state" id="empty-state" style="display:none;">
+                <div class="empty-icon">📭</div>
+                <p>No job postings yet.</p>
+                <a href="e_create_job.html" class="btn-primary" style="display:inline-block;margin-top:1rem;text-decoration:none;">Post Your First Job</a>
+            </div>
+        </div>
+    </main>
+
+    <footer class="minimal-footer">
+        <div class="footer-links"><a href="#">Terms of Service</a><a href="#">Privacy Policy</a><a href="#">Employer Terms</a></div>
+        <div class="footer-copyright">&copy; 2026 ITMP. All rights reserved.</div>
+    </footer>
+
+    <script src="../../assests/js/data.js"></script>
+    <script>
+        let _allJobs = [];
+        let _filter  = 'all';
+
+        function setFilter(f, btn) {
+            _filter = f;
+            document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
+            btn.classList.add('active');
+            renderList();
+        }
+
+        function statusClass(s) {
+            if (/clos/i.test(s)) return 'status-closed';
+            if (/draft/i.test(s)) return 'status-draft';
+            return 'status-open';
+        }
+
+        function renderList() {
+            const list  = document.getElementById('jobs-list');
+            const empty = document.getElementById('empty-state');
+
+            let items = _allJobs;
+            if (_filter === 'open')   items = items.filter(j => !(/clos|draft/i.test(j.status || '')));
+            if (_filter === 'draft')  items = items.filter(j => /draft/i.test(j.status || ''));
+            if (_filter === 'closed') items = items.filter(j => /clos/i.test(j.status || ''));
+
+            if (!items.length) { list.innerHTML = ''; empty.style.display = 'block'; return; }
+            empty.style.display = 'none';
+
+            list.innerHTML = items.map(job => {
+                const status    = job.status || 'Open';
+                const statusCls = statusClass(status);
+                const posted    = DataService.timeAgo ? DataService.timeAgo(job.posted_date) : '';
+                return `
+                <div class="card posting-card">
+                    <div class="posting-top">
+                        <div>
+                            <div class="posting-title"><a href="e_view_job.html?id=${job.id}">${job.title}</a></div>
+                            <div class="posting-meta">
+                                <span class="meta-tag">📍 ${job.location || '—'}</span>
+                                <span class="meta-tag">🖥️ ${job.work_mode || '—'}</span>
+                                <span class="meta-tag">💼 ${job.job_type || '—'}</span>
+                                ${posted ? `<span class="meta-tag">📅 ${posted}</span>` : ''}
+                                ${job.expires_date ? `<span class="meta-tag">🗓 Closes ${job.expires_date}</span>` : ''}
+                            </div>
+                        </div>
+                        <span class="status-pill ${statusCls}">${status}</span>
+                    </div>
+                    <div class="posting-actions">
+                        <span class="applicant-count">👥 ${job.applications_count ?? 0} applicants</span>
+                        <a href="e_view_job.html?id=${job.id}" class="btn-primary btn-sm" style="text-decoration:none;">View &amp; Manage</a>
+                        <a href="e_search_result.html" class="btn-secondary btn-sm" style="text-decoration:none;">Find Candidates</a>
+                        <button class="btn-text" style="color:#c0392b;margin-left:auto;" onclick="deleteJob('${job.id}')">Delete</button>
+                    </div>
+                </div>`;
+            }).join('');
+        }
+
+        function renderSummary(jobs) {
+            const open = jobs.filter(j => !(/clos|draft/i.test(j.status || ''))).length;
+            const apps = jobs.reduce((sum, j) => sum + (j.applications_count || 0), 0);
+            document.getElementById('stat-total').textContent = jobs.length;
+            document.getElementById('stat-open').textContent  = open;
+            document.getElementById('stat-apps').textContent  = apps;
+        }
+
+        function deleteJob(jobId) {
+            if (!confirm('Delete this job listing? This cannot be undone.')) return;
+            const user = DataService.getCurrentUser();
+            if (!user) return;
+            fetch(`http://localhost:3000/api/jobs/${jobId}`, {
+                method: 'DELETE', headers: { 'X-User-Id': String(user.id) }
+            }).then(() => {
+                _allJobs = _allJobs.filter(j => String(j.id) !== String(jobId));
+                renderSummary(_allJobs);
+                renderList();
+            }).catch(() => alert('Could not delete the listing.'));
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            DataService.onReady(() => {
+                _allJobs = (DataService.getPostedJobs && DataService.getPostedJobs()) || [];
+                renderSummary(_allJobs);
+                renderList();
+            });
+        });
+    </script>
+</body>
+</html>

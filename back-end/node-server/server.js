@@ -43,6 +43,36 @@ app.use((req, res, next) => {
     next();
 });
 
+// ── Storage directories ───────────────────────────────────────────────
+const STORAGE_DIR = path.join(__dirname, 'storage');
+const RESUMES_DIR = path.join(STORAGE_DIR, 'resumes');
+const AVATARS_DIR = path.join(STORAGE_DIR, 'avatars');
+[STORAGE_DIR, RESUMES_DIR, AVATARS_DIR].forEach(d => {
+    if (!fs.existsSync(d)) fs.mkdirSync(d, { recursive: true });
+});
+
+// Serve stored files under /api/files/*
+app.use('/api/files', express.static(STORAGE_DIR));
+
+// ── Multer: resume storage (for /api/profile/resume) ─────────────────
+const resumeStorage = multer.diskStorage({
+    destination: (_req, _file, cb) => cb(null, RESUMES_DIR),
+    filename:    (_req, file,  cb) => {
+        cb(null, `resume_${Date.now()}_${Math.random().toString(36).slice(2)}${path.extname(file.originalname)}`);
+    },
+});
+const resumeUpload = multer({
+    storage:    resumeStorage,
+    limits:     { fileSize: 10 * 1024 * 1024 },
+    fileFilter: (_req, file, cb) => {
+        const ok = ['application/pdf',
+                    'application/msword',
+                    'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
+        if (ok.includes(file.mimetype)) cb(null, true);
+        else cb(new Error('Only PDF or DOCX files are accepted'), false);
+    },
+});
+
 // ── Helpers ───────────────────────────────────────────────────────────
 function uid(req) {
     const id = parseInt(req.headers['x-user-id']);
@@ -311,6 +341,48 @@ app.put('/api/profile/me', async (req, res) => {
     }
 });
 
+app.post('/api/profile/resume', resumeUpload.single('resume'), async (req, res) => {
+    const id = uid(req);
+    if (!id) return res.status(401).json({ error: 'Not authenticated.' });
+    if (!req.file) return res.status(400).json({ error: 'No file uploaded.' });
+
+    const resumeUrl = `/api/files/resumes/${req.file.filename}`;
+    try {
+        // Delete old file if it exists
+        const [[cp]] = await db.query('SELECT resume_path FROM candidate_profiles WHERE user_id = ?', [id]);
+        if (cp?.resume_path) {
+            const old = cp.resume_path.replace('/api/files/', '');
+            const oldPath = path.join(STORAGE_DIR, old);
+            if (fs.existsSync(oldPath)) fs.unlink(oldPath, () => {});
+        }
+        await db.query('UPDATE candidate_profiles SET resume_path = ? WHERE user_id = ?', [resumeUrl, id]);
+        const [[u]]   = await db.query('SELECT * FROM users WHERE id = ?', [id]);
+        const [[cpU]] = await db.query('SELECT * FROM candidate_profiles WHERE user_id = ?', [id]);
+        return res.json(formatCandidate({ ...u, ...(cpU || {}) }));
+    } catch (e) {
+        console.error('[profile/resume POST]', e.message);
+        res.status(500).json({ error: 'Failed to save resume.' });
+    }
+});
+
+app.delete('/api/profile/resume', async (req, res) => {
+    const id = uid(req);
+    if (!id) return res.status(401).json({ error: 'Not authenticated.' });
+    try {
+        const [[cp]] = await db.query('SELECT resume_path FROM candidate_profiles WHERE user_id = ?', [id]);
+        if (cp?.resume_path) {
+            const rel = cp.resume_path.replace('/api/files/', '');
+            const filePath = path.join(STORAGE_DIR, rel);
+            if (fs.existsSync(filePath)) fs.unlink(filePath, () => {});
+        }
+        await db.query('UPDATE candidate_profiles SET resume_path = NULL WHERE user_id = ?', [id]);
+        res.json({ success: true });
+    } catch (e) {
+        console.error('[profile/resume DELETE]', e.message);
+        res.status(500).json({ error: 'Failed to delete resume.' });
+    }
+});
+
 app.get('/api/profile/candidate/:id', async (req, res) => {
     try {
         const [[user]] = await db.query(
@@ -454,6 +526,37 @@ app.post('/api/jobs/:id/save', async (req, res) => {
     }
 });
 
+app.get('/api/jobs/:id/applicants', async (req, res) => {
+    const empId = uid(req);
+    if (!empId) return res.status(401).json({ error: 'Not authenticated.' });
+    try {
+        const [[job]] = await db.query(
+            'SELECT id FROM jobs WHERE id = ? AND employer_id = ?', [req.params.id, empId]
+        );
+        if (!job) return res.status(403).json({ error: 'Forbidden.' });
+        const [rows] = await db.query(`
+            SELECT u.id, u.email, u.phone,
+                   cp.full_name, cp.headline, cp.location, cp.skills,
+                   cp.avatar_color, cp.avatar_initials, cp.open_to_work,
+                   cp.yoe, cp.work_mode_preference, cp.availability,
+                   a.applied_at, a.status
+            FROM applications a
+            JOIN users u ON a.candidate_id = u.id
+            LEFT JOIN candidate_profiles cp ON u.id = cp.user_id
+            WHERE a.job_id = ?
+            ORDER BY a.applied_at DESC
+        `, [req.params.id]);
+        res.json(rows.map(r => ({
+            ...formatCandidate({ ...r, id: r.id }),
+            applied_at: r.applied_at,
+            status:     r.status || 'pending',
+        })));
+    } catch (e) {
+        console.error('[jobs/:id/applicants]', e.message);
+        res.status(500).json({ error: 'Failed to load applicants.' });
+    }
+});
+
 // ── My data ───────────────────────────────────────────────────────────
 
 app.get('/api/my/applications', async (req, res) => {
@@ -503,6 +606,39 @@ app.get('/api/my/jobs', async (req, res) => {
     }
 });
 
+// ── Employers (for candidate browse) ─────────────────────────────────
+
+app.get('/api/employers', async (req, res) => {
+    try {
+        const [rows] = await db.query(`
+            SELECT u.id, u.email, u.phone, u.created_at,
+                   cp.company_name, cp.abn, cp.description, cp.website, cp.industry, cp.location
+            FROM users u
+            JOIN company_profiles cp ON u.id = cp.user_id
+            WHERE u.account_type = 'company'
+            ORDER BY cp.company_name ASC
+        `);
+        res.json(rows.map(r => formatEmployer({ ...r, id: r.id })));
+    } catch (e) {
+        console.error('[employers]', e.message);
+        res.status(500).json({ error: 'Failed to load employers.' });
+    }
+});
+
+app.get('/api/profile/employer/:id', async (req, res) => {
+    try {
+        const [[user]] = await db.query(
+            "SELECT * FROM users WHERE id = ? AND account_type = 'company'", [req.params.id]
+        );
+        if (!user) return res.status(404).json({ error: 'Employer not found.' });
+        const [[ep]] = await db.query('SELECT * FROM company_profiles WHERE user_id = ?', [user.id]);
+        return res.json(formatEmployer({ ...user, ...(ep || {}) }));
+    } catch (e) {
+        console.error('[profile/employer]', e.message);
+        res.status(500).json({ error: 'Failed to load employer.' });
+    }
+});
+
 // ── Candidates (for employer search / browse) ─────────────────────────
 
 app.get('/api/candidates', async (req, res) => {
@@ -531,6 +667,7 @@ const SCANNER_PATH = path.join(SCANNER_DIR, 'resume-scanner.py');
 const VENV_PYTHON  = path.join(SCANNER_DIR, 'venv', 'bin', 'python');
 const PYTHON_BIN   = fs.existsSync(VENV_PYTHON) ? VENV_PYTHON : 'python3';
 
+// ── Multer: parse-resume (temp dir, existing behaviour) ──────────────
 const upload = multer({
     storage: multer.diskStorage({
         destination: (_req, _file, cb) => cb(null, os.tmpdir()),
