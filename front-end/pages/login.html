@@ -165,8 +165,8 @@
                 }
                 localStorage.setItem('itmp_user', JSON.stringify(data));
                 window.location.href = data.account_type === 'company'
-                    ? '/pages/auth/e_dashboard.html'
-                    : '/pages/auth/c_dashboard.html';
+                    ? '/itmp/pages/auth/e_dashboard.html'
+                    : '/itmp/pages/auth/c_dashboard.html';
             } catch {
                 alert('Could not reach server. Make sure the backend is running.');
                 btn.textContent = 'Sign in';
