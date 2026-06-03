@@ -1,11 +1,4 @@
-#!/bin/bash
-
-# Stop Node.js app
-if [[ -f node.pid ]]; then
-    kill "$(cat node.pid)" && echo "Stopped Node app."
-    rm node.pid
-else
-    echo "node.pid not found."
-fi
-
-echo "Apps stopped."
+#!/usr/bin/env bash
+# Thin wrapper — delegates to setup/server.sh
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+exec "$SCRIPT_DIR/../../../setup/server.sh" stop
