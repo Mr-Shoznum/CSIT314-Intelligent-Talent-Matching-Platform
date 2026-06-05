@@ -169,7 +169,7 @@
             if (!confirm('Delete this job listing? This cannot be undone.')) return;
             const user = DataService.getCurrentUser();
             if (!user) return;
-            fetch(`http://localhost:3000/api/jobs/${jobId}`, {
+            fetch(`/api/jobs/${jobId}`, {
                 method: 'DELETE', headers: { 'X-User-Id': String(user.id) }
             }).then(() => {
                 _allJobs = _allJobs.filter(j => String(j.id) !== String(jobId));

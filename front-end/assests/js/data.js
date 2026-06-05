@@ -53,7 +53,7 @@ const DataService = (() => {
 
         if (!stored?.id) {
             if (window.location.pathname.includes('/auth/')) {
-                window.location.replace('/pages/login.html');
+                window.location.replace('/itmp/pages/login.html');
                 return;
             }
             _ready = true;
@@ -272,7 +272,7 @@ const DataService = (() => {
     // ── Auth ──────────────────────────────────────────────────────────
     function logout() {
         localStorage.removeItem('itmp_user');
-        window.location.replace('/pages/login.html');
+        window.location.replace('/itmp/pages/login.html');
     }
 
     // ── Skills match ──────────────────────────────────────────────────

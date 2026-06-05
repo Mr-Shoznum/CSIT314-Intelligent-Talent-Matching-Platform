@@ -90,3 +90,13 @@ ITMP API server running on http://localhost:3000
 Python: /root/itmp/CSIT314-Intelligent-Talent-Matching-Platform/back-end/scripting/python-scripts/venv/bin/python
 ITMP API server running on http://localhost:3000
 Python: /root/itmp/CSIT314-Intelligent-Talent-Matching-Platform/back-end/scripting/python-scripts/venv/bin/python
+[register] Duplicate entry 'john@gmail.comm' for key 'users.email'
+[register] Duplicate entry '12312312' for key 'users.email'
+ITMP API server running on http://localhost:3000
+Python: /root/itmp/CSIT314-Intelligent-Talent-Matching-Platform/back-end/scripting/python-scripts/venv/bin/python
+ITMP API server running on http://localhost:3000
+Python: /root/itmp/CSIT314-Intelligent-Talent-Matching-Platform/back-end/scripting/python-scripts/venv/bin/python
+ITMP API server running on http://localhost:3000
+Python: /root/itmp/CSIT314-Intelligent-Talent-Matching-Platform/back-end/scripting/python-scripts/venv/bin/python
+ITMP API server running on http://localhost:3000
+Python: /root/itmp/CSIT314-Intelligent-Talent-Matching-Platform/back-end/scripting/python-scripts/venv/bin/python

@@ -535,10 +535,10 @@ app.get('/api/jobs/:id/applicants', async (req, res) => {
         );
         if (!job) return res.status(403).json({ error: 'Forbidden.' });
         const [rows] = await db.query(`
-            SELECT u.id, u.email, u.phone,
-                   cp.full_name, cp.headline, cp.location, cp.skills,
-                   cp.avatar_color, cp.avatar_initials, cp.open_to_work,
-                   cp.yoe, cp.work_mode_preference, cp.availability,
+            SELECT u.id, u.email, u.phone, u.created_at,
+                   cp.first_name, cp.last_name, cp.headline, cp.bio, cp.location,
+                   cp.work_mode_preference, cp.skills, cp.experience, cp.education,
+                   cp.resume_path, cp.availability, cp.yoe, cp.open_to_work,
                    a.applied_at, a.status
             FROM applications a
             JOIN users u ON a.candidate_id = u.id

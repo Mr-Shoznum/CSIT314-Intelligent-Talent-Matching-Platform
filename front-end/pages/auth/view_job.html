@@ -580,7 +580,7 @@
             if (!container) return;
             container.style.display = 'block';
 
-            const API = `http://localhost:3000/api/jobs/${jobId}/applicants`;
+            const API = `/api/jobs/${jobId}/applicants`;
             fetch(API, { headers: { 'X-User-Id': String(user.id) } })
                 .then(r => r.ok ? r.json() : Promise.reject(r.status))
                 .then(applicants => {
