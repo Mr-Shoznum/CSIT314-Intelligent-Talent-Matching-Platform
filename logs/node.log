@@ -1,0 +1,92 @@
+node:events:502
+      throw er; // Unhandled 'error' event
+      ^
+
+Error: listen EADDRINUSE: address already in use :::3000
+    at Server.setupListenHandle [as _listen2] (node:net:1908:16)
+    at listenInCluster (node:net:1965:12)
+    at Server.listen (node:net:2067:7)
+    at Function.listen (/root/itmp/CSIT314-Intelligent-Talent-Matching-Platform/back-end/node-server/node_modules/express/lib/application.js:635:24)
+    at Object.<anonymous> (/root/itmp/CSIT314-Intelligent-Talent-Matching-Platform/back-end/node-server/server.js:731:5)
+    at Module._compile (node:internal/modules/cjs/loader:1521:14)
+    at Module._extensions..js (node:internal/modules/cjs/loader:1623:10)
+    at Module.load (node:internal/modules/cjs/loader:1266:32)
+    at Module._load (node:internal/modules/cjs/loader:1091:12)
+    at Function.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:164:12)
+Emitted 'error' event on Server instance at:
+    at emitErrorNT (node:net:1944:8)
+    at process.processTicksAndRejections (node:internal/process/task_queues:82:21) {
+  code: 'EADDRINUSE',
+  errno: -98,
+  syscall: 'listen',
+  address: '::',
+  port: 3000
+}
+
+Node.js v20.20.2
+ITMP API server running on http://localhost:3000
+Python: /root/itmp/CSIT314-Intelligent-Talent-Matching-Platform/back-end/scripting/python-scripts/venv/bin/python
+[parse-resume] scanner exited 1 Traceback (most recent call last):
+  File "/root/itmp/CSIT314-Intelligent-Talent-Matching-Platform/back-end/scripting/python-scripts/resume-scanner.py", line 2, in <module>
+    import spacy
+  File "/root/itmp/CSIT314-Intelligent-Talent-Matching-Platform/back-end/scripting/python-scripts/venv/lib/python3.12/site-packages/spacy/__init__.py", line 18, in <module>
+    from .cli.info import info  # noqa: F401
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/itmp/CSIT314-Intelligent-Talent-Matching-Platform/back-end/scripting/python-scripts/venv/lib/python3.12/site-packages/spacy/cli/__init__.py", line 4, in <module>
+    from . import download as download_module  # noqa: F401
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/itmp/CSIT314-Intelligent-Talent-Matching-Platform/back-end/scripting/python-scripts/venv/lib/python3.12/site-packages/spacy/cli/download.py", line 21, in <module>
+    from ._util import SDIST_SUFFIX, WHEEL_SUFFIX, Arg, Opt, app
+  File "/root/itmp/CSIT314-Intelligent-Talent-Matching-Platform/back-end/scripting/python-scripts/venv/lib/python3.12/site-packages/spacy/cli/_util.py", line 18, in <module>
+    from click import NoSuchOption
+ModuleNotFoundError: No module named 'click'
+
+[parse-resume] scanner exited 1 Traceback (most recent call last):
+  File "/root/itmp/CSIT314-Intelligent-Talent-Matching-Platform/back-end/scripting/python-scripts/resume-scanner.py", line 2, in <module>
+    import spacy
+  File "/root/itmp/CSIT314-Intelligent-Talent-Matching-Platform/back-end/scripting/python-scripts/venv/lib/python3.12/site-packages/spacy/__init__.py", line 18, in <module>
+    from .cli.info import info  # noqa: F401
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/itmp/CSIT314-Intelligent-Talent-Matching-Platform/back-end/scripting/python-scripts/venv/lib/python3.12/site-packages/spacy/cli/__init__.py", line 4, in <module>
+    from . import download as download_module  # noqa: F401
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/itmp/CSIT314-Intelligent-Talent-Matching-Platform/back-end/scripting/python-scripts/venv/lib/python3.12/site-packages/spacy/cli/download.py", line 21, in <module>
+    from ._util import SDIST_SUFFIX, WHEEL_SUFFIX, Arg, Opt, app
+  File "/root/itmp/CSIT314-Intelligent-Talent-Matching-Platform/back-end/scripting/python-scripts/venv/lib/python3.12/site-packages/spacy/cli/_util.py", line 18, in <module>
+    from click import NoSuchOption
+ModuleNotFoundError: No module named 'click'
+
+[parse-resume] scanner exited 1 Traceback (most recent call last):
+  File "/root/itmp/CSIT314-Intelligent-Talent-Matching-Platform/back-end/scripting/python-scripts/resume-scanner.py", line 2, in <module>
+    import spacy
+  File "/root/itmp/CSIT314-Intelligent-Talent-Matching-Platform/back-end/scripting/python-scripts/venv/lib/python3.12/site-packages/spacy/__init__.py", line 18, in <module>
+    from .cli.info import info  # noqa: F401
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/itmp/CSIT314-Intelligent-Talent-Matching-Platform/back-end/scripting/python-scripts/venv/lib/python3.12/site-packages/spacy/cli/__init__.py", line 4, in <module>
+    from . import download as download_module  # noqa: F401
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/root/itmp/CSIT314-Intelligent-Talent-Matching-Platform/back-end/scripting/python-scripts/venv/lib/python3.12/site-packages/spacy/cli/download.py", line 21, in <module>
+    from ._util import SDIST_SUFFIX, WHEEL_SUFFIX, Arg, Opt, app
+  File "/root/itmp/CSIT314-Intelligent-Talent-Matching-Platform/back-end/scripting/python-scripts/venv/lib/python3.12/site-packages/spacy/cli/_util.py", line 18, in <module>
+    from click import NoSuchOption
+ModuleNotFoundError: No module named 'click'
+
+[register] Duplicate entry 'alexgrech05@gmail.com' for key 'users.email'
+[register] Duplicate entry 'Joe' for key 'users.email'
+[register] Duplicate entry 'alextest2@gmail.com' for key 'users.email'
+[register] Duplicate entry 'alextest2@gmail.com' for key 'users.email'
+ITMP API server running on http://localhost:3000
+Python: /root/itmp/CSIT314-Intelligent-Talent-Matching-Platform/back-end/scripting/python-scripts/venv/bin/python
+ITMP API server running on http://localhost:3000
+Python: /root/itmp/CSIT314-Intelligent-Talent-Matching-Platform/back-end/scripting/python-scripts/venv/bin/python
+ITMP API server running on http://localhost:3000
+Python: /root/itmp/CSIT314-Intelligent-Talent-Matching-Platform/back-end/scripting/python-scripts/venv/bin/python
+ITMP API server running on http://localhost:3000
+Python: /root/itmp/CSIT314-Intelligent-Talent-Matching-Platform/back-end/scripting/python-scripts/venv/bin/python
+ITMP API server running on http://localhost:3000
+Python: /root/itmp/CSIT314-Intelligent-Talent-Matching-Platform/back-end/scripting/python-scripts/venv/bin/python
+[jobs/:id/applicants] Unknown column 'cp.full_name' in 'field list'
+ITMP API server running on http://localhost:3000
+Python: /root/itmp/CSIT314-Intelligent-Talent-Matching-Platform/back-end/scripting/python-scripts/venv/bin/python
+ITMP API server running on http://localhost:3000
+Python: /root/itmp/CSIT314-Intelligent-Talent-Matching-Platform/back-end/scripting/python-scripts/venv/bin/python
